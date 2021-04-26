@@ -1,0 +1,12 @@
+name: OrganicModelBuilder
+version: ${project.version}
+main: me.devrik.organicmodelbuilder.ModelsPlugin
+description: This plugin helps you create a base of your creations.
+api-version: 1.16
+prefix: OrganicModelBuilder
+depend: [WorldEdit]
+authors: [mrlasagne, devrik]
+commands:
+  model:
+    description: This is the main command to use the models plugin.
+    usage: /model help
