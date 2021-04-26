@@ -45,8 +45,8 @@ public class Model {
 
     public void next(Player p) {
         if (this.currentIndex >= this.order.size()) {
-            p.print(ChatColor.RED + "There isn't any part left to paste.");
-            p.print(ChatColor.YELLOW + "You can either cancel your last part, adjust any of them with" + ChatColor.WHITE + ChatColor.ITALIC + " /model adjust" + ChatColor.RESET + ChatColor.YELLOW + " or validate the model as it is with " + ChatColor.WHITE + ChatColor.ITALIC + " /model end.");
+            p.print(MessageManager.m(Message.NO_MORE_TO_PASTE1));
+            p.print(MessageManager.m(Message.NO_MORE_TO_PASTE2));
         } else {
             double yaw = Math.toRadians(this.modulosDegree(p.getLocation().getYaw()));
             double pitch = Math.toRadians(this.modulosDegree(p.getLocation().getPitch()));
@@ -65,14 +65,19 @@ public class Model {
                 part.updatePos(part.pos);
                 ++this.currentIndex;
                 if (this.currentIndex < this.order.size()) {
-                    ModelsCommands.sendMessages(p, new String[]{ChatColor.GREEN + "The part was successfully placed, the values are :", String.format("YAW=%.2f PITCH=%.2f ROLL=%.2f", Math.toDegrees(part.yaw), Math.toDegrees(part.pitch), Math.toDegrees(part.roll)), "", ChatColor.YELLOW + "You can now place the next part " + ChatColor.BOLD + ChatColor.WHITE + "(" + (String)this.order.get(this.currentIndex) + ")" + ChatColor.RESET + ChatColor.YELLOW + " with left click", ChatColor.YELLOW + "or you can cancel it with right click. (You need to have an item in your hand)", ChatColor.YELLOW + "You can also modify the values of the current part with", "" + ChatColor.WHITE + ChatColor.ITALIC + " /model adjust " + (String)this.order.get(this.currentIndex - 1) + " <yaw> <pitch> <roll>." + ChatColor.RESET + ChatColor.YELLOW + "You will be able to do it later too."});
+                    p.print(MessageManager.m(Message.PART_PLACED));
+                    p.print(String.format("YAW=%.2f PITCH=%.2f ROLL=%.2f", Math.toDegrees(part.yaw), Math.toDegrees(part.pitch), Math.toDegrees(part.roll)));
+                    p.print(MessageManager.m(Message.PLACE_NEXT_PART) + ChatColor.BOLD + ChatColor.WHITE + "(" + this.order.get(this.currentIndex) + ")" + ChatColor.RESET + ChatColor.YELLOW + " " + MessageManager.m(Message.WITH_LEFT_CLICK));
+                    p.print(MessageManager.m(Message.OR_CANCEL));
+                    p.print(MessageManager.m(Message.OR_MODIFY));
+                    p.print("" + ChatColor.WHITE + ChatColor.ITALIC + " /model adjust " + this.order.get(this.currentIndex - 1) + " <yaw> <pitch> <roll>." + ChatColor.RESET + ChatColor.YELLOW + " " + MessageManager.m(Message.AND_LATER));
                 }
 
                 if (this.currentIndex >= this.order.size()) {
-                    p.print(ChatColor.GREEN + "You have successfully placed all the part.");
-                    p.print(ChatColor.YELLOW + "You can now validate the model as it is with " + ChatColor.WHITE + ChatColor.ITALIC + " /model end");
-                    p.print(ChatColor.YELLOW + "Or you can adjust the parts values with " + ChatColor.WHITE + ChatColor.ITALIC + " /model adjust <part> <yaw> <pitch> <roll>");
-                    p.print(ChatColor.YELLOW + "These are the current values :");
+                    p.print(MessageManager.m(Message.PASTE_ALL1));
+                    p.print(MessageManager.m(Message.PASTE_ALL2));
+                    p.print(MessageManager.m(Message.PASTE_ALL3));
+                    p.print(MessageManager.m(Message.PASTE_ALL4));
                     p.print("");
 
                     for (String name : this.order) {
@@ -102,7 +107,7 @@ public class Model {
             if (!(this.parts.get(this.order.get(this.currentIndex))).cancel(player, null)) {
                 ++this.currentIndex;
             } else {
-                player.print(ChatColor.GREEN + "Last part cancelled, you will now place : " + ChatColor.BOLD + ChatColor.WHITE + this.order.get(this.currentIndex));
+                player.print(MessageManager.m(Message.CANCELLED) + ChatColor.BOLD + ChatColor.WHITE + this.order.get(this.currentIndex));
             }
             return false;
         }
@@ -110,11 +115,11 @@ public class Model {
 
     public boolean modify(Player p, String name, double yaw, double pitch, double roll) throws CommandException {
         if (this.currentIndex < this.order.size()) {
-            throw new CommandException(ChatColor.RED + "You can't use that command now, you haven't placed all the parts.");
+            throw new CommandException(MessageManager.m(Message.NOT_ALL_PLACED));
         } else {
             Model.Part part = this.parts.get(name);
             if (part == null) {
-                throw new CommandException(ChatColor.RED + "The part " + name + " cannot be found.");
+                throw new CommandException(MessageManager.m(Message.PART_NOT_FOUND));
             } else {
                 double lastYaw = part.yaw;
                 double lastPitch = part.pitch;
@@ -136,14 +141,14 @@ public class Model {
     }
 
     public void finalise(ModelsPlugin plugin, Player player) {
-        player.print(ChatColor.AQUA + "Adding to history...");
+        player.print(MessageManager.m(Message.ADD_TO_HISTORY));
 
         for (String s : this.order) {
             WorldEdit.getInstance().getSessionManager().get(player).remember(this.parts.get(s).changes);
         }
 
         plugin.currents.remove(player.getUniqueId());
-        player.print(ChatColor.GREEN + "The validation process is a success.");
+        player.print(MessageManager.m(Message.VALIDATION_SUCCESS));
     }
 
     public boolean isAtTheEnd() {
@@ -151,14 +156,14 @@ public class Model {
     }
 
     public void stop(ModelsPlugin plugin, Player player) {
-        player.print(ChatColor.AQUA + "Merging parts...");
+        player.print(MessageManager.m(Message.MERGING_PARTS));
 
         for(int i = 0; i < this.currentIndex; ++i) {
             WorldEdit.getInstance().getSessionManager().get(player).remember(((Model.Part)this.parts.get(this.order.get(i))).changes);
         }
 
         plugin.currents.remove(player.getUniqueId());
-        player.print(ChatColor.GREEN + "The abort process is a  success");
+        player.print(MessageManager.m(Message.CANCEL_SUCCESS));
     }
 
     public class Part {

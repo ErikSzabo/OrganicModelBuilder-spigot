@@ -9,32 +9,44 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
+import me.devrik.organicmodelbuilder.commands.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.FileUtil;
 
 public class ModelsPlugin extends JavaPlugin implements Listener {
+    private final CommandManager commandManager = new CommandManager();
     public HashMap<String, ModelPart> registry = new HashMap<>();
     public HashMap<UUID, Model> currents = new HashMap<>();
-    public ModelsCommands commands;
     public WorldEditPlugin worldedit;
     public static boolean FAWE = false;
+
+
     private boolean isInit = false;
 
     public ModelsPlugin() {
     }
 
     public void onLoad() {
-        if (!getDataFolder().exists()) getDataFolder().mkdir();
+        if (!getDataFolder().exists()) {
+            getDataFolder().mkdir();
+        }
+        saveDefaultConfig();
+        commandManager.addCommand(new AdjustCommand());
+        commandManager.addCommand(new CancelCommand());
+        commandManager.addCommand(new EndCommand());
+        commandManager.addCommand(new HelpCommand(commandManager));
+        commandManager.addCommand(new InitCommand());
+        commandManager.addCommand(new ListCommand());
+        commandManager.addCommand(new LoadCommand());
+        commandManager.addCommand(new RollCommand());
 
         File f = new File(this.getDataFolder(), "models");
         if (!f.exists()) {
@@ -53,62 +65,34 @@ public class ModelsPlugin extends JavaPlugin implements Listener {
         } else {
             this.getLogger().warning("Couldn't find WorldEdit or FAWE!");
         }
+
+        MessageManager.init(this);
     }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(args.length > 0 && args[0].equals("init")) {
-            if (!isInit) {
-                isInit = true;
-                File f = new File(this.getDataFolder(), "models");
-                try {
-                    File[] files = f.listFiles();
-
-                    for (File sub : files) {
-                        if (sub.isDirectory()) {
-                            File json = new File(sub, sub.getName() + ".json");
-
-                            try {
-                                JsonObject obj = (new JsonParser()).parse(new FileReader(json)).getAsJsonObject();
-                                String modelName = sub.getName();
-                                ModelPart part = this.loadModel(modelName, obj);
-                                this.registry.put(modelName, part);
-                            } catch (IOException | IllegalAccessException | InstantiationException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                    sender.sendMessage(ChatColor.GREEN + "Model initialization was successful!");
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                    e.printStackTrace();
-                    sender.sendMessage(ChatColor.RED + "Model initialization failed! Check console for errors.");
-                }
-            } else {
-                sender.sendMessage(ChatColor.GREEN + "Already initialized!");
-            }
+        if(args.length < 1) {
+            sender.sendMessage(MessageManager.m(Message.CMD_INVALID));
             return true;
         }
+        commandManager.executeCommand(args[0], this, sender, args);
+        return true;
+    }
 
+    public boolean isInit() {
+        return isInit;
+    }
 
-        if (sender instanceof Player) {
-            com.sk89q.worldedit.entity.Player player = this.worldedit.wrapPlayer((Player)sender);
-            if (args.length >= 1) {
-                String[] newArgs = new String[args.length - 1];
-                System.arraycopy(args, 1, newArgs, 0, args.length - 1);
-                return this.commands.onCommand(args[0], player, newArgs);
-            } else {
-                sender.sendMessage("These are the possible commands : ");
-                return this.commands.onCommand("help", player, new String[0]);
-            }
-        } else {
-            sender.sendMessage("This command can only be used by a player.");
-            return true;
-        }
+    public void setInit(boolean init) {
+        isInit = init;
+    }
+
+    public CommandManager getCommandManager() {
+        return commandManager;
     }
 
     public void onEnable() {
         this.getServer().getPluginManager().registerEvents(this, this);
-        this.commands = new ModelsCommands(this);
+        getCommand("model").setTabCompleter(new TabCompletion(this));
         this.getLogger().warning("Model initialization will start after 30 seconds automatically!");
         new BukkitRunnable() {
             @Override
@@ -146,7 +130,7 @@ public class ModelsPlugin extends JavaPlugin implements Listener {
         }.runTaskLaterAsynchronously(this, 600);
     }
 
-    private ModelPart loadModel(String modelName, JsonObject obj) throws IOException, IllegalAccessException, InstantiationException {
+    public ModelPart loadModel(String modelName, JsonObject obj) throws IOException, IllegalAccessException, InstantiationException {
         String name = obj.get("Name").getAsString();
         boolean flip = obj.get("flip").getAsBoolean();
         ModelPart[] children = this.loadChildren(modelName, obj.get("Childs").getAsJsonArray());
