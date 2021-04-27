@@ -1,4 +1,4 @@
-package me.devrik.organicmodelbuilder;
+package me.devrik.organicmodelbuilder.message;
 
 public enum Message {
     CMD_LOAD("translations.load"),

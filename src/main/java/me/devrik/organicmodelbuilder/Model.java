@@ -12,6 +12,9 @@ import com.sk89q.worldedit.world.World;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import me.devrik.organicmodelbuilder.message.Message;
+import me.devrik.organicmodelbuilder.message.MessageManager;
 import org.bukkit.ChatColor;
 
 public class Model {

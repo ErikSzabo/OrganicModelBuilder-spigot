@@ -7,6 +7,8 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import me.devrik.organicmodelbuilder.*;
+import me.devrik.organicmodelbuilder.message.Message;
+import me.devrik.organicmodelbuilder.message.MessageManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 

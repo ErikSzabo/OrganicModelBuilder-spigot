@@ -2,8 +2,8 @@ package me.devrik.organicmodelbuilder.command;
 
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.entity.Player;
-import me.devrik.organicmodelbuilder.Message;
-import me.devrik.organicmodelbuilder.MessageManager;
+import me.devrik.organicmodelbuilder.message.Message;
+import me.devrik.organicmodelbuilder.message.MessageManager;
 import me.devrik.organicmodelbuilder.ModelsPlugin;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;

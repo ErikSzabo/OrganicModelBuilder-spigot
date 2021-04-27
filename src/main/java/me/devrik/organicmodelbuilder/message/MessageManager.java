@@ -1,5 +1,6 @@
-package me.devrik.organicmodelbuilder;
+package me.devrik.organicmodelbuilder.message;
 
+import me.devrik.organicmodelbuilder.ModelsPlugin;
 import org.bukkit.ChatColor;
 
 import java.util.Objects;
