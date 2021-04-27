@@ -9,7 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
-import me.devrik.organicmodelbuilder.commands.*;
+import me.devrik.organicmodelbuilder.command.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;

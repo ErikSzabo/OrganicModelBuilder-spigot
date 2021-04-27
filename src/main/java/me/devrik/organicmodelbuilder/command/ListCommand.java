@@ -1,18 +1,16 @@
-package me.devrik.organicmodelbuilder.commands;
+package me.devrik.organicmodelbuilder.command;
 
 import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import me.devrik.organicmodelbuilder.Message;
 import me.devrik.organicmodelbuilder.MessageManager;
-import me.devrik.organicmodelbuilder.Model;
 import me.devrik.organicmodelbuilder.ModelsPlugin;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-public class CancelCommand extends Command {
-    public CancelCommand() {
-        super("cancel", "");
+public class ListCommand extends Command {
+    public ListCommand() {
+        super("list", "");
     }
 
     @Override
@@ -20,17 +18,16 @@ public class CancelCommand extends Command {
         org.bukkit.entity.Player player = (org.bukkit.entity.Player)sender;
         Player p = pl.worldedit.wrapPlayer(player);
 
-        if (!pl.currents.containsKey(p.getUniqueId())) {
-            throw new CommandException(MessageManager.m(Message.NOT_CREATING));
+        StringBuilder builder = new StringBuilder();
+        for(String key : pl.registry.keySet()) {
+            builder.append("   " + ChatColor.RESET + "- " + ChatColor.YELLOW).append(key).append("\n");
         }
-
-        Model current = pl.currents.get(p.getUniqueId());
-
-        current.cancel(p);
+        player.sendMessage(MessageManager.m(Message.LOADED_MODELS));
+        player.sendMessage(builder.toString());
     }
 
     @Override
     public String getDescription() {
-        return MessageManager.m(Message.CMD_CANCEL);
+        return MessageManager.m(Message.CMD_LIST);
     }
 }

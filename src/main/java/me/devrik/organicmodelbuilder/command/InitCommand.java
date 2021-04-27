@@ -1,4 +1,4 @@
-package me.devrik.organicmodelbuilder.commands;
+package me.devrik.organicmodelbuilder.command;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -7,7 +7,6 @@ import me.devrik.organicmodelbuilder.Message;
 import me.devrik.organicmodelbuilder.MessageManager;
 import me.devrik.organicmodelbuilder.ModelPart;
 import me.devrik.organicmodelbuilder.ModelsPlugin;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.io.File;

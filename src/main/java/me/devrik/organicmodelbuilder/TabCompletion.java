@@ -1,6 +1,5 @@
 package me.devrik.organicmodelbuilder;
 
-import me.devrik.organicmodelbuilder.commands.CommandManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -21,7 +20,7 @@ public class TabCompletion implements TabCompleter {
         List<String> suggestions = new ArrayList<>();
 
         if(args.length == 1) {
-            for(me.devrik.organicmodelbuilder.commands.Command cmd : pl.getCommandManager().getCommands()) {
+            for(me.devrik.organicmodelbuilder.command.Command cmd : pl.getCommandManager().getCommands()) {
                 suggestions.add(cmd.getName());
             }
             return suggestions;

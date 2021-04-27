@@ -1,4 +1,4 @@
-package me.devrik.organicmodelbuilder.commands;
+package me.devrik.organicmodelbuilder.command;
 
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.entity.Player;
@@ -8,7 +8,6 @@ import me.devrik.organicmodelbuilder.ModelsPlugin;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.hover.content.Text;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 

@@ -1,4 +1,4 @@
-package me.devrik.organicmodelbuilder.commands;
+package me.devrik.organicmodelbuilder.command;
 
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.entity.Player;
@@ -6,7 +6,6 @@ import me.devrik.organicmodelbuilder.Message;
 import me.devrik.organicmodelbuilder.MessageManager;
 import me.devrik.organicmodelbuilder.Model;
 import me.devrik.organicmodelbuilder.ModelsPlugin;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 public class AdjustCommand extends Command {

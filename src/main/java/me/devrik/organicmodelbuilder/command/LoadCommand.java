@@ -1,4 +1,4 @@
-package me.devrik.organicmodelbuilder.commands;
+package me.devrik.organicmodelbuilder.command;
 
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.WorldEdit;
