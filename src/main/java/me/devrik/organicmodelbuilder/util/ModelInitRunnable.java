@@ -19,29 +19,23 @@ public class ModelInitRunnable extends BukkitRunnable {
             return;
         }
         File f = new File(ModelsPlugin.getInstance().getDataFolder(), "models");
-        try {
-            File[] files = f.listFiles();
+        File[] files = f.listFiles();
 
-            for (File sub : files) {
-                if (sub.isDirectory()) {
-                    File json = new File(sub, sub.getName() + ".json");
+        for (File sub : files) {
+            if (sub.isDirectory()) {
+                File json = new File(sub, sub.getName() + ".json");
 
-                    try {
-                        JsonObject obj = (new JsonParser()).parse(new FileReader(json)).getAsJsonObject();
-                        String modelName = sub.getName();
-                        ModelPart part = ModelLoader.loadModel(modelName, obj);
-                        ModelsPlugin.getStateManager().registerModelPart(part);
-                    } catch (IOException | IllegalAccessException | InstantiationException e) {
-                        e.printStackTrace();
-                    }
+                try {
+                    JsonObject obj = (new JsonParser()).parse(new FileReader(json)).getAsJsonObject();
+                    String modelName = sub.getName();
+                    ModelPart part = ModelLoader.loadModel(modelName, obj);
+                    ModelsPlugin.getStateManager().registerModelPart(part);
+                } catch (IOException | IllegalAccessException | InstantiationException e) {
+                    e.printStackTrace();
                 }
             }
-            ModelsPlugin.logger().info(ChatColor.GREEN + "Model initialization was successful!");
-            ModelsPlugin.getStateManager().setInit(true);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-            ModelsPlugin.logger().warning(ChatColor.RED + "Model initialization failed! Check console for errors.");
         }
+        ModelsPlugin.logger().info(ChatColor.GREEN + "Model initialization was successful!");
+        ModelsPlugin.getStateManager().setInit(true);
     }
 }

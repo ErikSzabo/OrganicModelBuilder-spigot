@@ -5,12 +5,12 @@ import me.devrik.organicmodelbuilder.model.ModelPart;
 
 import java.io.File;
 
-public class ModelPartFawe extends ModelPart {
-    public ModelPartFawe(String modelName, String name, ModelPart[] children, boolean flip) {
+public class ModelPartFAWE extends ModelPart {
+    public ModelPartFAWE(String modelName, String name, ModelPart[] children, boolean flip) {
         this(modelName, name, children, flip, new File(ModelsPlugin.getInstance().getDataFolder(), "models/" + modelName + "/" + name + ".schematic"));
     }
 
-    public ModelPartFawe(String modelName, String name, ModelPart[] children, boolean flip, File file) {
+    public ModelPartFAWE(String modelName, String name, ModelPart[] children, boolean flip, File file) {
         super(modelName, name, children, flip, file);
     }
 }

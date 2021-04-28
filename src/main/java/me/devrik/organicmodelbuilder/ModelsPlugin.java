@@ -62,8 +62,12 @@ public class ModelsPlugin extends JavaPlugin {
     public void onEnable() {
         this.getServer().getPluginManager().registerEvents(new PlayerInteractEventHandler(), this);
         this.getCommand("model").setTabCompleter(new TabCompletion());
-        this.getLogger().warning("Model initialization will start after 30 seconds automatically!");
-        new ModelInitRunnable().runTaskLaterAsynchronously(this, 600);
+        try {
+            new ModelInitRunnable().run();
+        } catch (Exception  e) {
+            getLogger().warning("Automatic model loading failed. Retrying after 30 seconds");
+            new ModelInitRunnable().runTaskLaterAsynchronously(this, 600);
+        }
     }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
