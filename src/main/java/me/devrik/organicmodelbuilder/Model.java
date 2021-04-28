@@ -1,91 +1,75 @@
 package me.devrik.organicmodelbuilder;
 
-import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
+import me.devrik.organicmodelbuilder.message.Message;
+import me.devrik.organicmodelbuilder.message.MessageManager;
+import org.bukkit.ChatColor;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.bukkit.ChatColor;
 
+/**
+ * Represents a model that is currently being created by a player.
+ */
 public class Model {
-    public static HashMap<Integer, Integer> vectors = new HashMap<>();
-    private String name;
-    private final HashMap<String, Model.Part> parts = new HashMap<>();
+    /**
+     * Name of the model
+     */
+    private final String name;
+    /**
+     * Active model parts in the model
+     */
+    private final HashMap<String, ActivePart> parts = new HashMap<>();
+    /**
+     * Active model parts names in order
+     */
     private final List<String> order = new ArrayList<>();
-    public double scale;
+    /**
+     * Scale of the model (max 2)
+     */
+    private final double scale;
+    /**
+     * WorldEdit pattern
+     */
     private final Pattern pattern;
+    /**
+     * World where the model is being created
+     */
     private final World world;
-    public double currentRoll = 0.0D;
+    /**
+     * Current rotation value
+     */
+    private double currentRoll = 0.0D;
+    /**
+     * Index of the current part that will be placed.
+     * Can be used to index the order list.
+     */
     private int currentIndex;
 
     public Model(ModelPart mainPart, double scale, Pattern p, World world) {
-        this.name = mainPart.modelName;
+        this.name = mainPart.getModelName();
         this.scale = scale;
         this.pattern = p;
         this.world = world;
         this.addPart(mainPart);
-        vectors.clear();
     }
 
     private void addPart(ModelPart part) {
-        this.parts.put(part.partName, new Model.Part(part));
-        this.order.add(part.partName);
+        parts.put(part.getName(), new ActivePart(this, part));
+        order.add(part.getName());
 
         for (ModelPart child : part.getChildren()) {
-            this.addPart(child);
+            addPart(child);
         }
     }
 
-    public void next(Player p) {
-        if (this.currentIndex >= this.order.size()) {
-            p.print(ChatColor.RED + "There isn't any part left to paste.");
-            p.print(ChatColor.YELLOW + "You can either cancel your last part, adjust any of them with" + ChatColor.WHITE + ChatColor.ITALIC + " /model adjust" + ChatColor.RESET + ChatColor.YELLOW + " or validate the model as it is with " + ChatColor.WHITE + ChatColor.ITALIC + " /model end.");
-        } else {
-            double yaw = Math.toRadians(this.modulosDegree(p.getLocation().getYaw()));
-            double pitch = Math.toRadians(this.modulosDegree(p.getLocation().getPitch()));
-            double roll = Math.toRadians(this.modulosDegree((float)this.currentRoll));
-            this.currentRoll = 0.0D;
-            Model.Part part = this.parts.get(this.order.get(this.currentIndex));
-            if (this.currentIndex == 0) {
-                part.pos = BlockVector3.at(p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ());
-                p.setPosition(p.getBlockOn().toVector().add(0.0D, part.getMaxRadius(this.scale), 0.0D), p.getLocation().getPitch(), p.getLocation().getYaw());
-            }
-
-            part.yaw = yaw;
-            part.pitch = pitch;
-            part.roll = roll;
-            if (part.paste(p, false)) {
-                part.updatePos(part.pos);
-                ++this.currentIndex;
-                if (this.currentIndex < this.order.size()) {
-                    ModelsCommands.sendMessages(p, new String[]{ChatColor.GREEN + "The part was successfully placed, the values are :", String.format("YAW=%.2f PITCH=%.2f ROLL=%.2f", Math.toDegrees(part.yaw), Math.toDegrees(part.pitch), Math.toDegrees(part.roll)), "", ChatColor.YELLOW + "You can now place the next part " + ChatColor.BOLD + ChatColor.WHITE + "(" + (String)this.order.get(this.currentIndex) + ")" + ChatColor.RESET + ChatColor.YELLOW + " with left click", ChatColor.YELLOW + "or you can cancel it with right click. (You need to have an item in your hand)", ChatColor.YELLOW + "You can also modify the values of the current part with", "" + ChatColor.WHITE + ChatColor.ITALIC + " /model adjust " + (String)this.order.get(this.currentIndex - 1) + " <yaw> <pitch> <roll>." + ChatColor.RESET + ChatColor.YELLOW + "You will be able to do it later too."});
-                }
-
-                if (this.currentIndex >= this.order.size()) {
-                    p.print(ChatColor.GREEN + "You have successfully placed all the part.");
-                    p.print(ChatColor.YELLOW + "You can now validate the model as it is with " + ChatColor.WHITE + ChatColor.ITALIC + " /model end");
-                    p.print(ChatColor.YELLOW + "Or you can adjust the parts values with " + ChatColor.WHITE + ChatColor.ITALIC + " /model adjust <part> <yaw> <pitch> <roll>");
-                    p.print(ChatColor.YELLOW + "These are the current values :");
-                    p.print("");
-
-                    for (String name : this.order) {
-                        Part part2 = this.parts.get(name);
-                        p.print(ChatColor.BLUE + name + ChatColor.RESET + " : " + String.format("YAW=%.2f PITCH=%.2f ROLL=%.2f", Math.toDegrees(part2.yaw), Math.toDegrees(part2.pitch), Math.toDegrees(part2.roll)));
-                    }
-                }
-
-            }
-        }
-    }
-
-    private float modulosDegree(float degree) {
+    private float moduloDegree(float degree) {
         degree %= 360.0F;
         if (degree < 0.0F) {
             degree += 360.0F;
@@ -94,167 +78,158 @@ public class Model {
         return degree;
     }
 
-    public boolean cancel(Player player) {
-        if (this.currentIndex == 0) {
-            return true;
+    // TODO: What the fuck is this
+    public void next(Player p) {
+        if (currentIndex >= order.size()) {
+            p.print(MessageManager.m(Message.NO_MORE_TO_PASTE1));
+            p.print(MessageManager.m(Message.NO_MORE_TO_PASTE2));
         } else {
-            --this.currentIndex;
-            if (!(this.parts.get(this.order.get(this.currentIndex))).cancel(player, null)) {
-                ++this.currentIndex;
-            } else {
-                player.print(ChatColor.GREEN + "Last part cancelled, you will now place : " + ChatColor.BOLD + ChatColor.WHITE + this.order.get(this.currentIndex));
+            double yaw = Math.toRadians(moduloDegree(p.getLocation().getYaw()));
+            double pitch = Math.toRadians(moduloDegree(p.getLocation().getPitch()));
+            double roll = Math.toRadians(moduloDegree((float)currentRoll));
+            currentRoll = 0.0D;
+            ActivePart part = parts.get(order.get(currentIndex));
+            if (currentIndex == 0) {
+                part.setPosition(BlockVector3.at(p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ()));
+                p.setPosition(p.getBlockOn().toVector().add(0.0D, part.getMaxRadius(scale), 0.0D), p.getLocation().getPitch(), p.getLocation().getYaw());
             }
-            return false;
+
+            part.setYaw(yaw);
+            part.setPitch(pitch);
+            part.setRoll(roll);
+            if (part.paste(p, false)) {
+                part.updatePos(part.getPosition());
+                ++currentIndex;
+                if (currentIndex < order.size()) {
+                    p.print(MessageManager.m(Message.PART_PLACED));
+                    p.print(String.format("YAW=%.2f PITCH=%.2f ROLL=%.2f", Math.toDegrees(part.getYaw()), Math.toDegrees(part.getPitch()), Math.toDegrees(part.getRoll())));
+                    p.print(MessageManager.m(Message.PLACE_NEXT_PART) + ChatColor.BOLD + ChatColor.WHITE + "(" + order.get(currentIndex) + ")" + ChatColor.RESET + ChatColor.YELLOW + " " + MessageManager.m(Message.WITH_LEFT_CLICK));
+                    p.print(MessageManager.m(Message.OR_CANCEL));
+                    p.print(MessageManager.m(Message.OR_MODIFY));
+                    p.print("" + ChatColor.WHITE + ChatColor.ITALIC + " /model adjust " + order.get(currentIndex - 1) + " <yaw> <pitch> <roll>." + ChatColor.RESET + ChatColor.YELLOW + " " + MessageManager.m(Message.AND_LATER));
+                }
+
+                if (currentIndex >= order.size()) {
+                    p.print(MessageManager.m(Message.PASTE_ALL1));
+                    p.print(MessageManager.m(Message.PASTE_ALL2));
+                    p.print(MessageManager.m(Message.PASTE_ALL3));
+                    p.print(MessageManager.m(Message.PASTE_ALL4));
+                    p.print("");
+
+                    for (String name : order) {
+                        ActivePart part2 = parts.get(name);
+                        p.print(ChatColor.BLUE + name + ChatColor.RESET + " : " + String.format("YAW=%.2f PITCH=%.2f ROLL=%.2f", Math.toDegrees(part2.getYaw()), Math.toDegrees(part2.getPitch()), Math.toDegrees(part2.getRoll())));
+                    }
+                }
+
+            }
         }
     }
 
+    /**
+     * Returns true if undo was successful.
+     * If nothing to undo, returns false.
+     *
+     * @param player Player who is performing the undo operation on the model
+     * @return true if successful, false if nothing to undo
+     */
+    public boolean undo(Player player) {
+        if (currentIndex == 0) return false;
+        boolean success = parts.get(order.get(currentIndex - 1)).undo(player, null);
+        if(!success) return false;
+        currentIndex--;
+        return true;
+    }
+
+    /**
+     * Modifies a part based on the new values. Returns false if the operation fails.
+     *
+     * @param p     player who executes the modify
+     * @param name  name of the part
+     * @param yaw   new yaw of the part
+     * @param pitch new pitch of the part
+     * @param roll  new rotation of the part
+     * @return      true if update was successful, false if it wasn't
+     * @throws CommandException When not all parts are placed, or when the selected part not found
+     */
     public boolean modify(Player p, String name, double yaw, double pitch, double roll) throws CommandException {
-        if (this.currentIndex < this.order.size()) {
-            throw new CommandException(ChatColor.RED + "You can't use that command now, you haven't placed all the parts.");
-        } else {
-            Model.Part part = this.parts.get(name);
-            if (part == null) {
-                throw new CommandException(ChatColor.RED + "The part " + name + " cannot be found.");
-            } else {
-                double lastYaw = part.yaw;
-                double lastPitch = part.pitch;
-                double lastRoll = part.roll;
-                part.yaw = Math.toRadians(yaw);
-                part.pitch = Math.toRadians(pitch);
-                part.roll = Math.toRadians(roll);
-                if (!part.update(p)) {
-                    part.yaw = lastYaw;
-                    part.pitch = lastPitch;
-                    part.roll = lastRoll;
-                    part.updatePos(part.pos);
-                    return false;
-                } else {
-                    return true;
-                }
-            }
+        if (currentIndex < order.size()) {
+            throw new CommandException(MessageManager.m(Message.NOT_ALL_PLACED));
         }
+
+        ActivePart part = parts.get(name);
+        if (part == null) {
+            throw new CommandException(MessageManager.m(Message.PART_NOT_FOUND));
+        }
+
+        return part.update(p, Math.toRadians(yaw), Math.toRadians(pitch), Math.toRadians(roll));
     }
 
+    /**
+     * Saves the model creation process to WorldEdit history.
+     *
+     * @param plugin plugin instance
+     * @param player player who created the model
+     */
     public void finalise(ModelsPlugin plugin, Player player) {
-        player.print(ChatColor.AQUA + "Adding to history...");
-
-        for (String s : this.order) {
-            WorldEdit.getInstance().getSessionManager().get(player).remember(this.parts.get(s).changes);
+        for (String s : order) {
+            WorldEdit.getInstance().getSessionManager().get(player).remember(parts.get(s).getChanges());
         }
-
-        plugin.currents.remove(player.getUniqueId());
-        player.print(ChatColor.GREEN + "The validation process is a success.");
     }
 
+    /**
+     * Determines if the model is completed or not.
+     *
+     * @return true if the model is completed
+     */
     public boolean isAtTheEnd() {
-        return this.currentIndex >= this.order.size();
+        return currentIndex >= order.size();
     }
 
-    public void stop(ModelsPlugin plugin, Player player) {
-        player.print(ChatColor.AQUA + "Merging parts...");
-
-        for(int i = 0; i < this.currentIndex; ++i) {
-            WorldEdit.getInstance().getSessionManager().get(player).remember(((Model.Part)this.parts.get(this.order.get(i))).changes);
+    /**
+     * Fully stops the model creation process.
+     *
+     * @param player player who is editing the model
+     */
+    public void cancel(Player player) {
+        for(int i = 0; i < currentIndex; ++i) {
+            WorldEdit.getInstance().getSessionManager().get(player).remember((parts.get(order.get(i))).getChanges());
         }
-
-        plugin.currents.remove(player.getUniqueId());
-        player.print(ChatColor.GREEN + "The abort process is a  success");
     }
 
-    public class Part {
-        private final ModelPart modelPart;
-        private boolean paste = false;
-        double yaw;
-        double pitch;
-        double roll;
-        EditSession changes;
-        BlockVector3 pos;
+    public String getName() {
+        return name;
+    }
 
-        public Part(ModelPart from) {
-            this.modelPart = from;
-        }
+    public HashMap<String, ActivePart> getParts() {
+        return parts;
+    }
 
-        public boolean paste(Player p, boolean modify) {
-            LocalSession session = WorldEdit.getInstance().getSessionManager().get(p);
-            this.changes = WorldEdit.getInstance().getEditSessionFactory().getEditSession(Model.this.world, session.getBlockChangeLimit(), session.getBlockBag(p), p);
+    public List<String> getOrder() {
+        return order;
+    }
 
-            try {
-                this.modelPart.paste(p, this.pos, this.yaw, this.pitch, this.roll, Model.this.scale, Model.this.pattern, this.changes);
-                if (modify) {
-                    BlockVector3[] poses = this.modelPart.getOffsets();
-                    ModelPart[] childs = this.modelPart.getChildren();
+    public double getScale() {
+        return scale;
+    }
 
-                    for(int i = 0; i < poses.length; ++i) {
-                        String childName = childs[i].partName;
-                        Model.Part child = Model.this.parts.get(childName);
-                        child.paste(p, true);
-                    }
-                }
+    public Pattern getPattern() {
+        return pattern;
+    }
 
-                this.paste = true;
-                return true;
-            } catch (FaweException e) {
-                p.print(ChatColor.RED + e.getLocalizedMessage());
-                return false;
-            }
-        }
+    public World getWorld() {
+        return world;
+    }
 
-        public boolean cancel(Player p, EditSession e) {
-            try {
-                boolean justCancel = e == null;
-                BlockVector3[] poses = this.modelPart.getOffsets();
-                ModelPart[] children = this.modelPart.getChildren();
+    public double getCurrentRoll() {
+        return currentRoll;
+    }
 
-                for(int i = 0; i < poses.length; ++i) {
-                    String childName = children[poses.length - i - 1].partName;
-                    Model.Part child = Model.this.parts.get(childName);
-                    child.cancel(p, e);
-                }
+    public int getCurrentIndex() {
+        return currentIndex;
+    }
 
-                if (!this.paste) {
-                    return true;
-                } else {
-                    if (justCancel) {
-                        e = WorldEdit.getInstance().getEditSessionFactory().getEditSession(Model.this.world, -1);
-                    }
-
-                    this.changes.undo(e);
-                    if (justCancel) {
-                        WorldEdit.getInstance().flushBlockBag(p, e);
-                        e.close();
-                    }
-
-                    this.changes = null;
-                    this.paste = false;
-                    return true;
-                }
-            } catch (FaweException exception) {
-                p.print(ChatColor.RED + exception.getLocalizedMessage());
-                return false;
-            }
-        }
-
-        public void updatePos(BlockVector3 pos) {
-            this.pos = pos;
-            BlockVector3[] poses = this.modelPart.getOffsets();
-            ModelPart[] children = this.modelPart.getChildren();
-
-            for(int i = 0; i < poses.length; ++i) {
-                String childName = children[i].partName;
-                Model.Part child = Model.this.parts.get(childName);
-                child.pos = this.pos.add(Transformer.apply(poses[i], this.yaw, this.pitch, this.roll, this.modelPart.flip, Model.this.scale));
-                child.updatePos(this.pos.add(Transformer.apply(poses[i], this.yaw, this.pitch, this.roll, this.modelPart.flip, Model.this.scale)));
-            }
-
-        }
-
-        public boolean update(Player p) {
-            this.updatePos(this.pos);
-            return this.cancel(p, null) && this.paste(p, true);
-        }
-
-        public double getMaxRadius(double scale) {
-            return this.modelPart.getMaxRadius(scale);
-        }
+    public void setCurrentRoll(double currentRoll) {
+        this.currentRoll = currentRoll;
     }
 }
