@@ -8,7 +8,6 @@ import me.devrik.organicmodelbuilder.model.ModelPart;
 import me.devrik.organicmodelbuilder.model.fawe.ActivePartFAWE;
 import me.devrik.organicmodelbuilder.model.fawe.ModelFAWE;
 import me.devrik.organicmodelbuilder.model.fawe.ModelPartFAWE;
-import me.devrik.organicmodelbuilder.model.worldedit.ActivePartWE;
 
 import java.io.File;
 
