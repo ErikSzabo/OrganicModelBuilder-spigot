@@ -26,7 +26,7 @@ public class LoadCommand extends Command {
             throw new CommandException(MessageManager.m(Message.NOT_ENOUGH_ARGS));
         }
 
-        String model = args[1];
+        String modelName = args[1];
         double scale = 1.0D;
         if (args.length > 2) {
             try {
@@ -55,16 +55,16 @@ public class LoadCommand extends Command {
             }
         }
 
-        if (pl.currents.containsKey(p.getUniqueId())) {
+        if (pl.getStateManager().hasPlayerSession(p)) {
             throw new CommandException(MessageManager.m(Message.ALREADY_CREATING));
         }
 
-        if (!pl.registry.containsKey(model.toLowerCase())) {
+        if (!pl.getStateManager().getModelList().contains(modelName.toLowerCase())) {
             throw new CommandException(MessageManager.m(Message.MODEL_NOT_FOUND));
         }
 
-        Model m = new Model(pl.registry.get(model.toLowerCase()), scale, pattern, p.getWorld());
-        pl.currents.put(p.getUniqueId(), m);
+        Model model = new Model(pl.getStateManager().getModelPart(modelName.toLowerCase()), scale, pattern, p.getWorld());
+        pl.getStateManager().registerPlayerSession(p, model);
         player.sendMessage(MessageManager.m(Message.MODEL_LOADED1));
         player.sendMessage(MessageManager.m(Message.MODEL_LOADED2));
         player.sendMessage(MessageManager.m(Message.MODEL_LOADED3));

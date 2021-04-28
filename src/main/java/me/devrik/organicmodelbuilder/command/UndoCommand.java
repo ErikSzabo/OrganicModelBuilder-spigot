@@ -6,11 +6,12 @@ import me.devrik.organicmodelbuilder.Model;
 import me.devrik.organicmodelbuilder.message.Message;
 import me.devrik.organicmodelbuilder.message.MessageManager;
 import me.devrik.organicmodelbuilder.ModelsPlugin;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-public class EndCommand extends Command{
-    public EndCommand() {
-        super("end", "");
+public class UndoCommand extends Command {
+    public UndoCommand() {
+        super("undo", "");
     }
 
     @Override
@@ -23,18 +24,18 @@ public class EndCommand extends Command{
         }
 
         Model model = pl.getStateManager().getSession(p);
-        if (!model.isAtTheEnd()) {
-            throw new CommandException(MessageManager.m(Message.NOT_COMPLETED));
-        }
 
-        player.sendMessage(MessageManager.m(Message.ADD_TO_HISTORY));
-        model.finalise(pl, p);
-        pl.getStateManager().unRegisterPlayerSession(p);
-        player.sendMessage(MessageManager.m(Message.VALIDATION_SUCCESS));
+        boolean success = model.undo(p);
+
+        if(success) {
+            player.sendMessage(MessageManager.m(Message.UNDOED) + ChatColor.BOLD + ChatColor.WHITE + model.getOrder().get(model.getCurrentIndex()));
+        } else {
+            player.sendMessage(MessageManager.m(Message.NOTHING_TO_UNDO));
+        }
     }
 
     @Override
     public String getDescription() {
-        return MessageManager.m(Message.CMD_END);
+        return MessageManager.m(Message.CMD_UNDO);
     }
 }

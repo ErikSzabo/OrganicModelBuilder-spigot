@@ -2,9 +2,9 @@ package me.devrik.organicmodelbuilder.command;
 
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.entity.Player;
+import me.devrik.organicmodelbuilder.Model;
 import me.devrik.organicmodelbuilder.message.Message;
 import me.devrik.organicmodelbuilder.message.MessageManager;
-import me.devrik.organicmodelbuilder.Model;
 import me.devrik.organicmodelbuilder.ModelsPlugin;
 import org.bukkit.command.CommandSender;
 
@@ -33,13 +33,14 @@ public class AdjustCommand extends Command {
             throw new CommandException(MessageManager.m(Message.YRP_NUMBER));
         }
 
-        if (!pl.currents.containsKey(p.getUniqueId())) {
+        if (!pl.getStateManager().hasPlayerSession(p)) {
             throw new CommandException(MessageManager.m(Message.NOT_CREATING));
         }
 
-        Model current = pl.currents.get(p.getUniqueId());
+        Model model = pl.getStateManager().getSession(p);
+        boolean success = model.modify(p, partName, yaw, pitch, roll);
 
-        if (current.modify(p, partName, yaw, pitch, roll)) {
+        if (success) {
             player.sendMessage(MessageManager.m(Message.PART_MODIFIED));
             player.sendMessage(String.format("YAW=%.2f PITCH=%.2f ROLL=%.2f", yaw, pitch, roll));
         }

@@ -6,6 +6,7 @@ public enum Message {
     CMD_ADJUST("translations.adjust"),
     CMD_END("translations.end"),
     CMD_LIST("translations.list"),
+    CMD_UNDO("translations.undo"),
     CMD_CANCEL("translations.cancel"),
     CMD_INIT("translations.init"),
     CMD_INVALID("translations.invalid"),
@@ -37,7 +38,7 @@ public enum Message {
     PASTE_ALL2("translations.paste-all2"),
     PASTE_ALL3("translations.paste-all3"),
     PASTE_ALL4("translations.paste-all4"),
-    CANCELLED("translations.cancelled"),
+    UNDOED("translations.undoed"),
     NOT_ALL_PLACED("translations.not-all-placed"),
     PART_NOT_FOUND("translations.part-not-found"),
     ADD_TO_HISTORY("translations.add-to-history"),
@@ -49,9 +50,8 @@ public enum Message {
     WITH_LEFT_CLICK("translations.with-left-click"),
     OR_CANCEL("translations.or-cancel"),
     OR_MODIFY("translations.or-modify"),
-    AND_LATER("translations.and-later");
-
-
+    AND_LATER("translations.and-later"),
+    NOTHING_TO_UNDO("translations.nothing-to-undo");
 
     private String value;
 

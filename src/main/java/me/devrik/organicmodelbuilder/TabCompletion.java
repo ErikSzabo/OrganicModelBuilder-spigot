@@ -27,7 +27,7 @@ public class TabCompletion implements TabCompleter {
         }
 
         if(args.length >= 1 && args[0].equals("load")) {
-            suggestions.addAll(pl.registry.keySet());
+            suggestions.addAll(pl.getStateManager().getModelList());
             return suggestions;
         }
 

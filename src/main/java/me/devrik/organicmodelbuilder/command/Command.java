@@ -33,10 +33,4 @@ public abstract class Command {
     public boolean canRunByConsole() {
         return console;
     }
-
-    public void sendMessages(org.bukkit.entity.Player p, String[] messages) {
-        for(String msg : messages) {
-            p.sendMessage(msg);
-        }
-    }
 }

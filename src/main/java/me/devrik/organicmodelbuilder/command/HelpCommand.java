@@ -27,7 +27,7 @@ public class HelpCommand extends Command {
         player.sendMessage(MessageManager.m(Message.HELP));
         for(Command c : manager.getCommands()) {
             HoverEvent e = new HoverEvent(HoverEvent.Action.SHOW_TEXT, (new Text(net.md_5.bungee.api.ChatColor.GREEN + c.getDescription())));
-            player.spigot().sendMessage(new ComponentBuilder("  -  /model ").append(c.getName()).color(net.md_5.bungee.api.ChatColor.GOLD).append(" : ").append(c.getUsage()).italic(true).color(net.md_5.bungee.api.ChatColor.YELLOW).event(e).create());
+            player.spigot().sendMessage(new ComponentBuilder("  -  /model ").append(c.getName()).color(net.md_5.bungee.api.ChatColor.GOLD).event(e).append(" : ").append(c.getUsage()).italic(true).color(net.md_5.bungee.api.ChatColor.YELLOW).create());
         }
     }
 

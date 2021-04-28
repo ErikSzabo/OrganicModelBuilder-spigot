@@ -3,10 +3,11 @@ package me.devrik.organicmodelbuilder.command;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sk89q.minecraft.util.commands.CommandException;
+import me.devrik.organicmodelbuilder.ModelPart;
 import me.devrik.organicmodelbuilder.message.Message;
 import me.devrik.organicmodelbuilder.message.MessageManager;
-import me.devrik.organicmodelbuilder.ModelPart;
 import me.devrik.organicmodelbuilder.ModelsPlugin;
+import me.devrik.organicmodelbuilder.util.ModelLoader;
 import org.bukkit.command.CommandSender;
 
 import java.io.File;
@@ -19,7 +20,7 @@ public class InitCommand extends Command {
 
     @Override
     public void execute(ModelsPlugin pl, CommandSender sender, String[] args) throws CommandException {
-        if(pl.isInit()) {
+        if(pl.getStateManager().isInit()) {
             sender.sendMessage(MessageManager.m(Message.INIT_ALREADY));
             return;
         }
@@ -33,12 +34,12 @@ public class InitCommand extends Command {
                     File json = new File(sub, sub.getName() + ".json");
                     JsonObject obj = (new JsonParser()).parse(new FileReader(json)).getAsJsonObject();
                     String modelName = sub.getName();
-                    ModelPart part = pl.loadModel(modelName, obj);
-                    pl.registry.put(modelName, part);
+                    ModelPart part = ModelLoader.loadModel(pl, modelName, obj);
+                    pl.getStateManager().registerModelPart(part);
                 }
             }
 
-            pl.setInit(true);
+            pl.getStateManager().setInit(true);
             sender.sendMessage(MessageManager.m(Message.INIT_SUCCESS));
         } catch (Exception e) {
             e.printStackTrace();

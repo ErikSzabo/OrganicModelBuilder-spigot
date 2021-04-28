@@ -19,8 +19,8 @@ public class ListCommand extends Command {
         Player p = pl.worldedit.wrapPlayer(player);
 
         StringBuilder builder = new StringBuilder();
-        for(String key : pl.registry.keySet()) {
-            builder.append("   " + ChatColor.RESET + "- " + ChatColor.YELLOW).append(key).append("\n");
+        for(String key : pl.getStateManager().getModelList()) {
+            builder.append("   " + ChatColor.LIGHT_PURPLE + "- " + ChatColor.YELLOW).append(key).append("\n");
         }
         player.sendMessage(MessageManager.m(Message.LOADED_MODELS));
         player.sendMessage(builder.toString());
