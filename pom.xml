@@ -64,14 +64,6 @@
         <repository>
             <id>sk89q-snapshots</id>
             <url>https://maven.enginehub.org/repo/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>
-                    true
-                </enabled>
-            </snapshots>
         </repository>
         <repository>
             <id>IntellectualSites</id>
@@ -90,11 +82,13 @@
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-bukkit</artifactId>
             <version>7.2.5</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.intellectualsites.fawe</groupId>
             <artifactId>FAWE-Bukkit</artifactId>
             <version>1.16-637</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>

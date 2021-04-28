@@ -1,6 +1,8 @@
 package me.devrik.organicmodelbuilder;
 
+import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.object.exception.FaweException;
+import com.boydti.fawe.util.EditSessionBuilder;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -34,13 +36,16 @@ public class ActivePart {
     }
 
     public boolean paste(Player p, boolean modify) {
-        LocalSession session = WorldEdit.getInstance().getSessionManager().get(p);
-        this.changes = WorldEdit.getInstance().getEditSessionFactory().getEditSession(model.getWorld(), session.getBlockChangeLimit(), session.getBlockBag(p), p);
+        try(EditSession session =  WorldEdit.getInstance().getEditSessionFactory().getEditSession(model.getWorld(), -1, p)) {
+            return pasteHelper(session, p, modify);
+        }
+    }
 
+    private boolean pasteHelper(EditSession e, Player p, boolean modify) {
+        this.changes = e;
         try {
             int maxR = getMaxRadius(model.getScale());
             BlockVector3 zero = position;
-            EditSession e = this.changes;
             Region region = new CuboidRegion(p.getWorld(), zero.add(-maxR, -maxR, -maxR), zero.add(maxR, maxR, maxR));
             RegionVisitor visitor = new RegionVisitor(region, position -> {
                 Clipboard schematic = modelPart.getSchematic();
@@ -60,8 +65,8 @@ public class ActivePart {
                     return false;
                 }
             });
-            Operations.completeBlindly(visitor);
-            e.close();
+
+            Operations.complete(visitor);
 
             if (modify) {
                 BlockVector3[] poses = this.modelPart.getOffsets();
@@ -76,9 +81,11 @@ public class ActivePart {
 
             this.paste = true;
             return true;
-        } catch (FaweException e) {
-            throw new CommandException(ChatColor.RED + e.getLocalizedMessage());
+        } catch (WorldEditException err) {
+            err.printStackTrace();
+            return false;
         }
+
     }
 
     public boolean undo(Player p, EditSession e) {
