@@ -1,6 +1,8 @@
 package me.devrik.organicmodelbuilder;
 
 import com.sk89q.worldedit.entity.Player;
+import me.devrik.organicmodelbuilder.model.Model;
+import me.devrik.organicmodelbuilder.model.ModelPart;
 
 import java.util.Collection;
 import java.util.HashMap;

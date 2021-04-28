@@ -18,7 +18,7 @@ public abstract class Command {
         this.console = console;
     }
 
-    public abstract void execute(ModelsPlugin pl, CommandSender sender, String[] args) throws CommandException;
+    public abstract void execute(CommandSender sender, String[] args) throws CommandException;
 
     public abstract String getDescription();
 

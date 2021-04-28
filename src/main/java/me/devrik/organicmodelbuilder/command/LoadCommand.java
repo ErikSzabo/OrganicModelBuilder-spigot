@@ -9,6 +9,8 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import me.devrik.organicmodelbuilder.*;
 import me.devrik.organicmodelbuilder.message.Message;
 import me.devrik.organicmodelbuilder.message.MessageManager;
+import me.devrik.organicmodelbuilder.model.Model;
+import me.devrik.organicmodelbuilder.model.factory.ModelFactory;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -18,9 +20,11 @@ public class LoadCommand extends Command {
     }
 
     @Override
-    public void execute(ModelsPlugin pl, CommandSender sender, String[] args) throws CommandException {
+    public void execute(CommandSender sender, String[] args) throws CommandException {
         org.bukkit.entity.Player player = (org.bukkit.entity.Player)sender;
-        Player p = pl.worldedit.wrapPlayer(player);
+        Player p = ModelsPlugin.getWE().wrapPlayer(player);
+        ModelFactory factory = ModelsPlugin.getModelFactory();
+        StateManager stateManager = ModelsPlugin.getStateManager();
 
         if (args.length < 2) {
             throw new CommandException(MessageManager.m(Message.NOT_ENOUGH_ARGS));
@@ -55,16 +59,16 @@ public class LoadCommand extends Command {
             }
         }
 
-        if (pl.getStateManager().hasPlayerSession(p)) {
+        if (stateManager.hasPlayerSession(p)) {
             throw new CommandException(MessageManager.m(Message.ALREADY_CREATING));
         }
 
-        if (!pl.getStateManager().getModelList().contains(modelName.toLowerCase())) {
+        if (!stateManager.getModelList().contains(modelName.toLowerCase())) {
             throw new CommandException(MessageManager.m(Message.MODEL_NOT_FOUND));
         }
 
-        Model model = new Model(pl.getStateManager().getModelPart(modelName.toLowerCase()), scale, pattern, p.getWorld());
-        pl.getStateManager().registerPlayerSession(p, model);
+        Model model = factory.getModel(stateManager.getModelPart(modelName.toLowerCase()), scale, pattern, p.getWorld());
+        stateManager.registerPlayerSession(p, model);
         player.sendMessage(MessageManager.m(Message.MODEL_LOADED1));
         player.sendMessage(MessageManager.m(Message.MODEL_LOADED2));
         player.sendMessage(MessageManager.m(Message.MODEL_LOADED3));

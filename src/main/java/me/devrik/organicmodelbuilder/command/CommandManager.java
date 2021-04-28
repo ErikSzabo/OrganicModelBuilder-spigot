@@ -21,7 +21,7 @@ public class CommandManager {
         return commands.values();
     }
 
-    public void executeCommand(String name, ModelsPlugin pl, CommandSender sender, String args[]) {
+    public void executeCommand(String name, CommandSender sender, String args[]) {
         if(!commands.containsKey(name)) {
             sender.sendMessage(MessageManager.m(Message.CMD_INVALID));
             return;
@@ -40,7 +40,7 @@ public class CommandManager {
         }
 
         try {
-            this.commands.get(name).execute(pl, sender, args);
+            this.commands.get(name).execute(sender, args);
         } catch (CommandException e) {
             sender.sendMessage(e.getMessage());
         }

@@ -2,7 +2,7 @@ package me.devrik.organicmodelbuilder.command;
 
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.entity.Player;
-import me.devrik.organicmodelbuilder.Model;
+import me.devrik.organicmodelbuilder.model.Model;
 import me.devrik.organicmodelbuilder.message.Message;
 import me.devrik.organicmodelbuilder.message.MessageManager;
 import me.devrik.organicmodelbuilder.ModelsPlugin;
@@ -14,15 +14,15 @@ public class RollCommand extends Command {
     }
 
     @Override
-    public void execute(ModelsPlugin pl, CommandSender sender, String[] args) throws CommandException {
+    public void execute(CommandSender sender, String[] args) throws CommandException {
         org.bukkit.entity.Player player = (org.bukkit.entity.Player)sender;
-        Player p = pl.worldedit.wrapPlayer(player);
+        Player p = ModelsPlugin.getWE().wrapPlayer(player);
 
         if (args.length < 2) {
             throw new CommandException(MessageManager.m(Message.NOT_ENOUGH_ARGS));
         }
 
-        if (!pl.getStateManager().hasPlayerSession(p)) {
+        if (!ModelsPlugin.getStateManager().hasPlayerSession(p)) {
             throw new CommandException(MessageManager.m(Message.NOT_CREATING));
         }
 
@@ -34,7 +34,7 @@ public class RollCommand extends Command {
             throw new CommandException(MessageManager.m(Message.ROTATION_NOT_NUMBER));
         }
 
-        Model model = pl.getStateManager().getSession(p);
+        Model model = ModelsPlugin.getStateManager().getSession(p);
         model.setCurrentRoll(rot % 360.0D);
         player.sendMessage(MessageManager.m(Message.ROLL_SUCCESS) + model.getCurrentRoll() + "°");
 

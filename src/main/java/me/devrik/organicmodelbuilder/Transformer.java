@@ -3,9 +3,6 @@ package me.devrik.organicmodelbuilder;
 import com.sk89q.worldedit.math.BlockVector3;
 
 public class Transformer {
-    public Transformer() {
-    }
-
     public static BlockVector3 apply(BlockVector3 in, double yaw, double pitch, double roll, boolean flip, double scale) {
         double x = in.getX();
         double y = in.getY();

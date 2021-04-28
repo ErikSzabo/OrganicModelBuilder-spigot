@@ -1,10 +1,6 @@
-package me.devrik.organicmodelbuilder;
+package me.devrik.organicmodelbuilder.model;
 
-import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.util.EditSessionBuilder;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
@@ -16,32 +12,29 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import me.devrik.organicmodelbuilder.Transformer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandException;
 
 
-public class ActivePart {
-    private final Model model;
-    private final ModelPart modelPart;
-    private boolean paste = false;
-    private double yaw;
-    private double pitch;
-    private double roll;
-    private EditSession changes;
-    private BlockVector3 position;
+public abstract class ActivePart {
+    protected final Model model;
+    protected final ModelPart modelPart;
+    protected boolean paste = false;
+    protected double yaw;
+    protected double pitch;
+    protected double roll;
+    protected EditSession changes;
+    protected BlockVector3 position;
 
     public ActivePart(Model model, ModelPart modelPart) {
         this.model = model;
         this.modelPart = modelPart;
     }
 
-    public boolean paste(Player p, boolean modify) {
-        try(EditSession session =  WorldEdit.getInstance().getEditSessionFactory().getEditSession(model.getWorld(), -1, p)) {
-            return pasteHelper(session, p, modify);
-        }
-    }
+    public abstract boolean paste(Player p, boolean modify);
 
-    private boolean pasteHelper(EditSession e, Player p, boolean modify) {
+    protected boolean pasteHelper(EditSession e, Player p, boolean modify) {
         this.changes = e;
         try {
             int maxR = getMaxRadius(model.getScale());
@@ -88,37 +81,34 @@ public class ActivePart {
 
     }
 
+    // TODO catch faweexception
     public boolean undo(Player p, EditSession e) {
-        try {
-            boolean justCancel = e == null;
-            BlockVector3[] poses = this.modelPart.getOffsets();
-            ModelPart[] children = this.modelPart.getChildren();
+        boolean justCancel = e == null;
+        BlockVector3[] poses = this.modelPart.getOffsets();
+        ModelPart[] children = this.modelPart.getChildren();
 
-            for(int i = 0; i < poses.length; ++i) {
-                String childName = children[poses.length - i - 1].getName();
-                ActivePart child = model.getParts().get(childName);
-                child.undo(p, e);
-            }
-
-            if (this.paste) {
-                if (justCancel) {
-                    e = WorldEdit.getInstance().getEditSessionFactory().getEditSession(model.getWorld(), -1);
-                }
-
-                this.changes.undo(e);
-                if (justCancel) {
-                    WorldEdit.getInstance().flushBlockBag(p, e);
-                    e.close();
-                }
-
-                this.changes = null;
-                this.paste = false;
-                return true;
-            }
-            return false;
-        } catch (FaweException exception) {
-            throw new CommandException(ChatColor.RED + exception.getLocalizedMessage());
+        for(int i = 0; i < poses.length; ++i) {
+            String childName = children[poses.length - i - 1].getName();
+            ActivePart child = model.getParts().get(childName);
+            child.undo(p, e);
         }
+
+        if (this.paste) {
+            if (justCancel) {
+                e = WorldEdit.getInstance().getEditSessionFactory().getEditSession(model.getWorld(), -1);
+            }
+
+            this.changes.undo(e);
+            if (justCancel) {
+                WorldEdit.getInstance().flushBlockBag(p, e);
+                e.close();
+            }
+
+            this.changes = null;
+            this.paste = false;
+            return true;
+        }
+        return false;
     }
 
     public void updatePos(BlockVector3 pos) {

@@ -1,12 +1,12 @@
 package me.devrik.organicmodelbuilder.command;
 
 import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.worldedit.entity.Player;
 import me.devrik.organicmodelbuilder.message.Message;
 import me.devrik.organicmodelbuilder.message.MessageManager;
 import me.devrik.organicmodelbuilder.ModelsPlugin;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class ListCommand extends Command {
     public ListCommand() {
@@ -14,12 +14,11 @@ public class ListCommand extends Command {
     }
 
     @Override
-    public void execute(ModelsPlugin pl, CommandSender sender, String[] args) throws CommandException {
-        org.bukkit.entity.Player player = (org.bukkit.entity.Player)sender;
-        Player p = pl.worldedit.wrapPlayer(player);
+    public void execute(CommandSender sender, String[] args) throws CommandException {
+        Player player = (Player)sender;
 
         StringBuilder builder = new StringBuilder();
-        for(String key : pl.getStateManager().getModelList()) {
+        for(String key : ModelsPlugin.getStateManager().getModelList()) {
             builder.append("   " + ChatColor.LIGHT_PURPLE + "- " + ChatColor.YELLOW).append(key).append("\n");
         }
         player.sendMessage(MessageManager.m(Message.LOADED_MODELS));

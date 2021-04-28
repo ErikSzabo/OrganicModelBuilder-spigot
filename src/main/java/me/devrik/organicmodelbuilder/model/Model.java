@@ -1,4 +1,4 @@
-package me.devrik.organicmodelbuilder;
+package me.devrik.organicmodelbuilder.model;
 
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.WorldEdit;
@@ -6,6 +6,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
+import me.devrik.organicmodelbuilder.ModelsPlugin;
 import me.devrik.organicmodelbuilder.message.Message;
 import me.devrik.organicmodelbuilder.message.MessageManager;
 import org.bukkit.ChatColor;
@@ -17,40 +18,40 @@ import java.util.List;
 /**
  * Represents a model that is currently being created by a player.
  */
-public class Model {
+public abstract class Model {
     /**
      * Name of the model
      */
-    private final String name;
+    protected final String name;
     /**
      * Active model parts in the model
      */
-    private final HashMap<String, ActivePart> parts = new HashMap<>();
+    protected final HashMap<String, ActivePart> parts = new HashMap<>();
     /**
      * Active model parts names in order
      */
-    private final List<String> order = new ArrayList<>();
+    protected final List<String> order = new ArrayList<>();
     /**
      * Scale of the model (max 2)
      */
-    private final double scale;
+    protected final double scale;
     /**
      * WorldEdit pattern
      */
-    private final Pattern pattern;
+    protected final Pattern pattern;
     /**
      * World where the model is being created
      */
-    private final World world;
+    protected final World world;
     /**
      * Current rotation value
      */
-    private double currentRoll = 0.0D;
+    protected double currentRoll = 0.0D;
     /**
      * Index of the current part that will be placed.
      * Can be used to index the order list.
      */
-    private int currentIndex;
+    protected int currentIndex;
 
     public Model(ModelPart mainPart, double scale, Pattern p, World world) {
         this.name = mainPart.getModelName();
@@ -61,7 +62,7 @@ public class Model {
     }
 
     private void addPart(ModelPart part) {
-        parts.put(part.getName(), new ActivePart(this, part));
+        parts.put(part.getName(), ModelsPlugin.getModelFactory().getActivePart(this, part));
         order.add(part.getName());
 
         for (ModelPart child : part.getChildren()) {
@@ -69,7 +70,7 @@ public class Model {
         }
     }
 
-    private float moduloDegree(float degree) {
+    protected float moduloDegree(float degree) {
         degree %= 360.0F;
         if (degree < 0.0F) {
             degree += 360.0F;

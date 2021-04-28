@@ -1,4 +1,4 @@
-package me.devrik.organicmodelbuilder;
+package me.devrik.organicmodelbuilder.model;
 
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
@@ -7,6 +7,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import me.devrik.organicmodelbuilder.ModelsPlugin;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -16,22 +17,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ModelPart {
-    private final ModelsPlugin plugin;
-    private final String name;
-    private final String modelName;
-    private final Clipboard schematic;
-    private final ModelPart[] children;
-    private final BlockVector3[] offsets;
-    private final boolean flip;
-    private int maxRadius;
+public abstract class ModelPart {
+    protected final String name;
+    protected final String modelName;
+    protected final Clipboard schematic;
+    protected final ModelPart[] children;
+    protected final BlockVector3[] offsets;
+    protected final boolean flip;
+    protected int maxRadius;
 
-    public ModelPart(ModelsPlugin plugin, String modelName, String name, ModelPart[] children, boolean flip) {
-        this(plugin, modelName, name, children, flip, new File(plugin.getDataFolder(), "models/" + modelName + "/" + name + ".schematic"));
+    public ModelPart(String modelName, String name, ModelPart[] children, boolean flip) {
+        this(modelName, name, children, flip, new File(ModelsPlugin.getInstance().getDataFolder(), "models/" + modelName + "/" + name + ".schematic"));
     }
 
-    public ModelPart(ModelsPlugin plugin, String modelName, String name, ModelPart[] children, boolean flip, File file) {
-        this.plugin = plugin;
+    public ModelPart(String modelName, String name, ModelPart[] children, boolean flip, File file) {
         this.maxRadius = 0;
         this.name = name;
         this.modelName = modelName;
@@ -40,7 +39,7 @@ public class ModelPart {
         this.schematic = this.loadSchematic(file);
         this.offsets = this.getChildPoints();
         if (this.offsets.length != this.children.length) {
-            plugin.getLogger().warning("The model " + modelName + " cannot be loaded properly because the part " + name + " does not have the same amount of child and location set to them.");
+            ModelsPlugin.logger().warning("The model " + modelName + " cannot be loaded properly because the part " + name + " does not have the same amount of child and location set to them.");
         }
 
         this.maxRadius = this.genMaxRadius();
@@ -53,7 +52,7 @@ public class ModelPart {
                     return reader.read();
             }
         } catch (IOException e) {
-            this.plugin.getLogger().warning("Schematic load failed " + e.getMessage());
+            ModelsPlugin.logger().warning("Schematic load failed " + e.getMessage());
             return null;
         }
     }
@@ -108,7 +107,7 @@ public class ModelPart {
         return ret;
     }
 
-    private int genMaxRadius() {
+    protected int genMaxRadius() {
         BlockVector3 o = this.schematic.getOrigin();
         BlockVector3 min = this.schematic.getRegion().getMinimumPoint();
         BlockVector3 max = this.schematic.getRegion().getMaximumPoint();
