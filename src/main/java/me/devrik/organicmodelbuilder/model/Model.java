@@ -130,12 +130,12 @@ public abstract class Model {
      */
     public boolean modify(Player p, String name, double yaw, double pitch, double roll) throws CommandException {
         if (currentIndex == 0) {
-            throw new CommandException(MessageManager.m(Message.NOT_ANY_PLACED));
+            throw new CommandException(MessageManager.g(Message.NOT_ANY_PLACED));
         }
 
         ActivePart part = parts.get(name);
         if (part == null) {
-            throw new CommandException(MessageManager.m(Message.PART_NOT_FOUND));
+            throw new CommandException(MessageManager.g(Message.PART_NOT_FOUND));
         }
 
         return part.update(p, Math.toRadians(yaw), Math.toRadians(pitch), Math.toRadians(roll));

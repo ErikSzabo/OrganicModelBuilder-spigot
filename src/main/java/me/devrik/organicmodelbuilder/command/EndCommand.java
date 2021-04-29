@@ -19,23 +19,23 @@ public class EndCommand extends Command{
         Player p = ModelsPlugin.getWE().wrapPlayer(player);
 
         if (!ModelsPlugin.getStateManager().hasPlayerSession(p)) {
-            throw new CommandException(MessageManager.m(Message.NOT_CREATING));
+            throw new CommandException(MessageManager.g(Message.NOT_CREATING));
         }
 
         Model model = ModelsPlugin.getStateManager().getSession(p);
         if (!model.isAtTheEnd()) {
-            throw new CommandException(MessageManager.m(Message.NOT_COMPLETED));
+            throw new CommandException(MessageManager.g(Message.NOT_COMPLETED));
         }
 
-        player.sendMessage(MessageManager.m(Message.ADD_TO_HISTORY));
+        MessageManager.m(player, Message.ADD_TO_HISTORY);
         model.finalise(ModelsPlugin.getInstance(), p);
         ModelsPlugin.getStateManager().unRegisterPlayerSession(p);
-        player.sendMessage(MessageManager.m(Message.VALIDATION_SUCCESS));
+        MessageManager.m(player, Message.VALIDATION_SUCCESS);
     }
 
     @Override
     public String getDescription() {
-        return MessageManager.m(Message.CMD_END);
+        return MessageManager.g(Message.CMD_END);
     }
 
     @Override

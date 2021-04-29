@@ -2,6 +2,7 @@ package me.devrik.organicmodelbuilder.command;
 
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.entity.Player;
+import me.devrik.organicmodelbuilder.message.Placeholder;
 import me.devrik.organicmodelbuilder.model.Model;
 import me.devrik.organicmodelbuilder.message.Message;
 import me.devrik.organicmodelbuilder.message.MessageManager;
@@ -19,11 +20,11 @@ public class RollCommand extends Command {
         Player p = ModelsPlugin.getWE().wrapPlayer(player);
 
         if (args.length < 2) {
-            throw new CommandException(MessageManager.m(Message.NOT_ENOUGH_ARGS));
+            throw new CommandException(MessageManager.g(Message.NOT_ENOUGH_ARGS));
         }
 
         if (!ModelsPlugin.getStateManager().hasPlayerSession(p)) {
-            throw new CommandException(MessageManager.m(Message.NOT_CREATING));
+            throw new CommandException(MessageManager.g(Message.NOT_CREATING));
         }
 
         double rot;
@@ -31,18 +32,17 @@ public class RollCommand extends Command {
         try {
             rot = Double.parseDouble(args[1]);
         } catch (NumberFormatException e) {
-            throw new CommandException(MessageManager.m(Message.ROTATION_NOT_NUMBER));
+            throw new CommandException(MessageManager.g(Message.ROTATION_NOT_NUMBER));
         }
 
         Model model = ModelsPlugin.getStateManager().getSession(p);
         model.setCurrentRoll(rot % 360.0D);
-        player.sendMessage(MessageManager.m(Message.ROLL_SUCCESS) + model.getCurrentRoll() + "°");
-
+        MessageManager.m(player, Message.ROLL_SUCCESS, Placeholder.of("roll", model.getCurrentRoll() + "°"));
     }
 
     @Override
     public String getDescription() {
-        return MessageManager.m(Message.CMD_ROLL);
+        return MessageManager.g(Message.CMD_ROLL);
     }
 
     @Override

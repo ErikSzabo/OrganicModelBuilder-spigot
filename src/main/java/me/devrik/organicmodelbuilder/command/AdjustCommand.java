@@ -19,7 +19,7 @@ public class AdjustCommand extends Command {
         Player p = ModelsPlugin.getWE().wrapPlayer(player);
 
         if (args.length < 5) {
-            throw new CommandException(MessageManager.m(Message.NOT_ENOUGH_ARGS));
+            throw new CommandException(MessageManager.g(Message.NOT_ENOUGH_ARGS));
         }
 
         String partName = args[1];
@@ -30,25 +30,25 @@ public class AdjustCommand extends Command {
             pitch = Double.parseDouble(args[3]);
             roll = Double.parseDouble(args[4]);
         } catch (NumberFormatException var13) {
-            throw new CommandException(MessageManager.m(Message.YRP_NUMBER));
+            throw new CommandException(MessageManager.g(Message.YRP_NUMBER));
         }
 
         if (!ModelsPlugin.getStateManager().hasPlayerSession(p)) {
-            throw new CommandException(MessageManager.m(Message.NOT_CREATING));
+            throw new CommandException(MessageManager.g(Message.NOT_CREATING));
         }
 
         Model model = ModelsPlugin.getStateManager().getSession(p);
         boolean success = model.modify(p, partName, yaw, pitch, roll);
 
         if (success) {
-            player.sendMessage(MessageManager.m(Message.PART_MODIFIED));
+            MessageManager.m(player, Message.PART_MODIFIED);
             player.sendMessage(String.format("YAW=%.2f PITCH=%.2f ROLL=%.2f", yaw, pitch, roll));
         }
     }
 
     @Override
     public String getDescription() {
-        return MessageManager.m(Message.CMD_ADJUST);
+        return MessageManager.g(Message.CMD_ADJUST);
     }
 
     @Override

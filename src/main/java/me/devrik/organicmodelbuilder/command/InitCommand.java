@@ -22,7 +22,7 @@ public class InitCommand extends Command {
     @Override
     public void execute(CommandSender sender, String[] args) throws CommandException {
         if(ModelsPlugin.getStateManager().isInit()) {
-            sender.sendMessage(MessageManager.m(Message.INIT_ALREADY));
+            sender.sendMessage(MessageManager.g(Message.INIT_ALREADY));
             return;
         }
 
@@ -41,16 +41,16 @@ public class InitCommand extends Command {
             }
 
             ModelsPlugin.getStateManager().setInit(true);
-            sender.sendMessage(MessageManager.m(Message.INIT_SUCCESS));
+            sender.sendMessage(MessageManager.g(Message.INIT_SUCCESS));
         } catch (Exception e) {
             e.printStackTrace();
-            sender.sendMessage(MessageManager.m(Message.INIT_FAILED));
+            sender.sendMessage(MessageManager.g(Message.INIT_FAILED));
         }
     }
 
     @Override
     public String getDescription() {
-        return MessageManager.m(Message.CMD_INIT);
+        return MessageManager.g(Message.CMD_INIT);
     }
 
     @Override

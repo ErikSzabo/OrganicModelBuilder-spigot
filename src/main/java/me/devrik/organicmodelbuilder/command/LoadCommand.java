@@ -9,9 +9,9 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import me.devrik.organicmodelbuilder.*;
 import me.devrik.organicmodelbuilder.message.Message;
 import me.devrik.organicmodelbuilder.message.MessageManager;
+import me.devrik.organicmodelbuilder.message.Placeholder;
 import me.devrik.organicmodelbuilder.model.Model;
 import me.devrik.organicmodelbuilder.model.factory.ModelFactory;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 public class LoadCommand extends Command {
@@ -27,7 +27,7 @@ public class LoadCommand extends Command {
         StateManager stateManager = ModelsPlugin.getStateManager();
 
         if (args.length < 2) {
-            throw new CommandException(MessageManager.m(Message.NOT_ENOUGH_ARGS));
+            throw new CommandException(MessageManager.g(Message.NOT_ENOUGH_ARGS));
         }
 
         String modelName = args[1];
@@ -36,12 +36,12 @@ public class LoadCommand extends Command {
             try {
                 scale = Double.parseDouble(args[2]);
             } catch (NumberFormatException e) {
-                throw new CommandException(MessageManager.m(Message.SCALE_NOT_NUMBER));
+                throw new CommandException(MessageManager.g(Message.SCALE_NOT_NUMBER));
             }
         }
 
         if (scale > 2.0D) {
-            throw new CommandException(MessageManager.m(Message.SCALE_TOO_BIG));
+            throw new CommandException(MessageManager.g(Message.SCALE_TOO_BIG));
         }
 
         Pattern pattern = null;
@@ -55,30 +55,28 @@ public class LoadCommand extends Command {
             try {
                 pattern = WorldEdit.getInstance().getPatternFactory().parseFromInput(args[3], parserContext);
             } catch (InputParseException e) {
-                throw new CommandException(MessageManager.m(Message.PATTERN_ERROR) + " " + e.getMessage());
+                throw new CommandException(MessageManager.g(Message.PATTERN_ERROR) + " " + e.getMessage());
             }
         }
 
         if (stateManager.hasPlayerSession(p)) {
-            throw new CommandException(MessageManager.m(Message.ALREADY_CREATING));
+            throw new CommandException(MessageManager.g(Message.ALREADY_CREATING));
         }
 
         if (!stateManager.getModelList().contains(modelName.toLowerCase())) {
-            throw new CommandException(MessageManager.m(Message.MODEL_NOT_FOUND));
+            throw new CommandException(MessageManager.g(Message.MODEL_NOT_FOUND));
         }
 
         Model model = factory.getModel(stateManager.getModelPart(modelName.toLowerCase()), scale, pattern, p.getWorld());
         stateManager.registerPlayerSession(p, model);
-        player.sendMessage(MessageManager.m(Message.MODEL_LOADED1));
-        player.sendMessage(MessageManager.m(Message.MODEL_LOADED2));
-        player.sendMessage(MessageManager.m(Message.MODEL_LOADED3));
-        player.sendMessage("" + ChatColor.WHITE + ChatColor.ITALIC + "/model roll <value>");
-
+        MessageManager.m(player, Message.MODEL_LOADED1);
+        MessageManager.m(player, Message.MODEL_LOADED2);
+        MessageManager.m(player, Message.MODEL_LOADED3, Placeholder.of("cmd_usage", "/model roll <value>"));
     }
 
     @Override
     public String getDescription() {
-        return MessageManager.m(Message.CMD_LOAD);
+        return MessageManager.g(Message.CMD_LOAD);
     }
 
     @Override

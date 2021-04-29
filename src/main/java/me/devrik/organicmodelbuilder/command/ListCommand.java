@@ -21,13 +21,13 @@ public class ListCommand extends Command {
         for(String key : ModelsPlugin.getStateManager().getModelList()) {
             builder.append("   " + ChatColor.LIGHT_PURPLE + "- " + ChatColor.YELLOW).append(key).append("\n");
         }
-        player.sendMessage(MessageManager.m(Message.LOADED_MODELS));
+        MessageManager.m(player, Message.LOADED_MODELS);
         player.sendMessage(builder.toString());
     }
 
     @Override
     public String getDescription() {
-        return MessageManager.m(Message.CMD_LIST);
+        return MessageManager.g(Message.CMD_LIST);
     }
 
     @Override

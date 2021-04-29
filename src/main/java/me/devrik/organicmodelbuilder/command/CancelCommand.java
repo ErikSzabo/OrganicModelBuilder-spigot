@@ -19,20 +19,20 @@ public class CancelCommand extends Command{
         Player p = ModelsPlugin.getWE().wrapPlayer(player);
 
         if (!ModelsPlugin.getStateManager().hasPlayerSession(p)) {
-            throw new CommandException(MessageManager.m(Message.NOT_CREATING));
+            throw new CommandException(MessageManager.g(Message.NOT_CREATING));
         }
 
         Model model = ModelsPlugin.getStateManager().getSession(p);
 
-        player.sendMessage(MessageManager.m(Message.MERGING_PARTS));
+        MessageManager.m(player, Message.MERGING_PARTS);
         model.cancel(p);
         ModelsPlugin.getStateManager().unRegisterPlayerSession(p);
-        player.sendMessage(MessageManager.m(Message.CANCEL_SUCCESS));
+        MessageManager.m(player, Message.CANCEL_SUCCESS);
     }
 
     @Override
     public String getDescription() {
-        return MessageManager.m(Message.CMD_CANCEL);
+        return MessageManager.g(Message.CMD_CANCEL);
     }
 
     @Override

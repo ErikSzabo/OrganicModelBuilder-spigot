@@ -2,12 +2,14 @@ package me.devrik.organicmodelbuilder.command;
 
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.entity.Player;
+import me.devrik.organicmodelbuilder.message.Placeholder;
 import me.devrik.organicmodelbuilder.model.Model;
 import me.devrik.organicmodelbuilder.message.Message;
 import me.devrik.organicmodelbuilder.message.MessageManager;
 import me.devrik.organicmodelbuilder.ModelsPlugin;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+
+import java.util.Collections;
 
 public class UndoCommand extends Command {
     public UndoCommand() {
@@ -20,7 +22,7 @@ public class UndoCommand extends Command {
         Player p = ModelsPlugin.getWE().wrapPlayer(player);
 
         if (!ModelsPlugin.getStateManager().hasPlayerSession(p)) {
-            throw new CommandException(MessageManager.m(Message.NOT_CREATING));
+            throw new CommandException(MessageManager.g(Message.NOT_CREATING));
         }
 
         Model model = ModelsPlugin.getStateManager().getSession(p);
@@ -28,15 +30,15 @@ public class UndoCommand extends Command {
         boolean success = model.undo(p);
 
         if(success) {
-            player.sendMessage(MessageManager.m(Message.UNDOED) + ChatColor.BOLD + ChatColor.WHITE + model.getCurrentPart().getName());
+            MessageManager.m(player, Message.UNDID, Placeholder.of("part", model.getBeforePart().getName()));
         } else {
-            player.sendMessage(MessageManager.m(Message.NOTHING_TO_UNDO));
+            MessageManager.m(player, Message.NOTHING_TO_UNDO);
         }
     }
 
     @Override
     public String getDescription() {
-        return MessageManager.m(Message.CMD_UNDO);
+        return MessageManager.g(Message.CMD_UNDO);
     }
 
     @Override

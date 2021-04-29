@@ -20,7 +20,7 @@ public class HelpCommand extends Command {
     public void execute(CommandSender sender, String[] args) throws CommandException {
         org.bukkit.entity.Player player = (org.bukkit.entity.Player)sender;
 
-        player.sendMessage(MessageManager.m(Message.HELP));
+        MessageManager.m(player, Message.HELP);
         for(Command c : ModelsPlugin.getCommandManager().getCommands()) {
             HoverEvent e = new HoverEvent(HoverEvent.Action.SHOW_TEXT, (new Text(net.md_5.bungee.api.ChatColor.GREEN + c.getDescription())));
             player.spigot().sendMessage(new ComponentBuilder("  -  /model ").append(c.getName()).color(net.md_5.bungee.api.ChatColor.GOLD).event(e).append(" : ").append(c.getUsage()).italic(true).color(net.md_5.bungee.api.ChatColor.YELLOW).create());
@@ -29,7 +29,7 @@ public class HelpCommand extends Command {
 
     @Override
     public String getDescription() {
-        return MessageManager.m(Message.CMD_LIST);
+        return MessageManager.g(Message.CMD_LIST);
     }
 
     @Override

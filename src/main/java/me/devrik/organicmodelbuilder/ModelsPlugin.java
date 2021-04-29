@@ -72,7 +72,7 @@ public class ModelsPlugin extends JavaPlugin {
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(args.length < 1) {
-            sender.sendMessage(MessageManager.m(Message.CMD_INVALID));
+            sender.sendMessage(MessageManager.g(Message.CMD_INVALID));
             return true;
         }
         commandManager.executeCommand(args[0], sender, args);

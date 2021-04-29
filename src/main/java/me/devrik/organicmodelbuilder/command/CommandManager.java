@@ -23,19 +23,19 @@ public class CommandManager {
 
     public void executeCommand(String name, CommandSender sender, String args[]) {
         if(!commands.containsKey(name)) {
-            sender.sendMessage(MessageManager.m(Message.CMD_INVALID));
+            sender.sendMessage(MessageManager.g(Message.CMD_INVALID));
             return;
         }
 
         Command command = commands.get(name);
 
         if((sender instanceof ConsoleCommandSender) && !command.canRunByConsole()) {
-            sender.sendMessage(MessageManager.m(Message.PLAYER_ONLY));
+            sender.sendMessage(MessageManager.g(Message.PLAYER_ONLY));
             return;
         }
 
         if(!sender.hasPermission("models.use")) {
-            sender.sendMessage(MessageManager.m(Message.NO_PERMISSION));
+            sender.sendMessage(MessageManager.g(Message.NO_PERMISSION));
             return;
         }
 
