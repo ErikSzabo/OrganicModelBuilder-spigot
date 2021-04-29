@@ -41,6 +41,6 @@ public class EndCommand extends Command{
     @Override
     public boolean canRunByPlayerRightNow(org.bukkit.entity.Player player) {
         Player p = ModelsPlugin.getWE().wrapPlayer(player);
-        return ModelsPlugin.getStateManager().hasPlayerSession(p);
+        return ModelsPlugin.getStateManager().hasPlayerSession(p) && ModelsPlugin.getStateManager().getSession(p).isAtTheEnd();
     }
 }

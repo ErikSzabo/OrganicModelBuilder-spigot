@@ -81,7 +81,6 @@ public abstract class ActivePart {
 
     }
 
-    // TODO catch faweexception
     public boolean undo(Player p, EditSession e) {
         boolean justCancel = e == null;
         BlockVector3[] poses = this.modelPart.getOffsets();
@@ -141,6 +140,16 @@ public abstract class ActivePart {
             updatePos(position);
         }
         return success;
+    }
+
+    public void updateYawPitchRoll(double yaw, double pitch, double roll) {
+        this.yaw = yaw;
+        this.pitch = pitch;
+        this.roll = roll;
+    }
+
+    public String getName() {
+        return modelPart.getName();
     }
 
     public int getMaxRadius(double scale) {

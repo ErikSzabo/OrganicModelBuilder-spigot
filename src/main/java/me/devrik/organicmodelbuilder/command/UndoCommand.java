@@ -28,7 +28,7 @@ public class UndoCommand extends Command {
         boolean success = model.undo(p);
 
         if(success) {
-            player.sendMessage(MessageManager.m(Message.UNDOED) + ChatColor.BOLD + ChatColor.WHITE + model.getOrder().get(model.getCurrentIndex()));
+            player.sendMessage(MessageManager.m(Message.UNDOED) + ChatColor.BOLD + ChatColor.WHITE + model.getCurrentPart().getName());
         } else {
             player.sendMessage(MessageManager.m(Message.NOTHING_TO_UNDO));
         }

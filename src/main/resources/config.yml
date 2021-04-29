@@ -37,7 +37,7 @@ translations:
   paste-all3: "&eOr you can adjust the parts values with &f/model adjust <part> <yaw> <pitch> <roll>"
   paste-all4: "&eThese are the current values:"
   undoed: "&aLast part cancelled, you will now place: "
-  not-all-placed: "&cYou can't use that command now, you haven't placed all the parts."
+  not-any-placed: "&cYou can't use that command now, you haven't placed any parts yet."
   part-not-found: "&cThe part cannot be found."
   add-to-history: "&bAdding to history..."
   validation-success: "&aThe validation process was successful."

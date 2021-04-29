@@ -9,7 +9,6 @@ import com.sk89q.worldedit.world.World;
 import me.devrik.organicmodelbuilder.ModelsPlugin;
 import me.devrik.organicmodelbuilder.message.Message;
 import me.devrik.organicmodelbuilder.message.MessageManager;
-import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,9 +27,9 @@ public abstract class Model {
      */
     protected final HashMap<String, ActivePart> parts = new HashMap<>();
     /**
-     * Active model parts names in order
+     * Active model parts in order
      */
-    protected final List<String> order = new ArrayList<>();
+    protected final List<ActivePart> partsOrder = new ArrayList<>();
     /**
      * Scale of the model (max 2)
      */
@@ -62,8 +61,9 @@ public abstract class Model {
     }
 
     private void addPart(ModelPart part) {
-        parts.put(part.getName(), ModelsPlugin.getModelFactory().getActivePart(this, part));
-        order.add(part.getName());
+        ActivePart activePart = ModelsPlugin.getModelFactory().getActivePart(this, part);
+        parts.put(part.getName(), activePart);
+        partsOrder.add(activePart);
 
         for (ModelPart child : part.getChildren()) {
             addPart(child);
@@ -79,52 +79,27 @@ public abstract class Model {
         return degree;
     }
 
-    // TODO: What the fuck is this
-    public void next(Player p) {
-        if (currentIndex >= order.size()) {
-            p.print(MessageManager.m(Message.NO_MORE_TO_PASTE1));
-            p.print(MessageManager.m(Message.NO_MORE_TO_PASTE2));
-        } else {
-            double yaw = Math.toRadians(moduloDegree(p.getLocation().getYaw()));
-            double pitch = Math.toRadians(moduloDegree(p.getLocation().getPitch()));
-            double roll = Math.toRadians(moduloDegree((float)currentRoll));
-            currentRoll = 0.0D;
-            ActivePart part = parts.get(order.get(currentIndex));
-            if (currentIndex == 0) {
-                part.setPosition(BlockVector3.at(p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ()));
-                p.setPosition(p.getBlockOn().toVector().add(0.0D, part.getMaxRadius(scale), 0.0D), p.getLocation().getPitch(), p.getLocation().getYaw());
-            }
-
-            part.setYaw(yaw);
-            part.setPitch(pitch);
-            part.setRoll(roll);
-            if (part.paste(p, false)) {
-                part.updatePos(part.getPosition());
-                ++currentIndex;
-                if (currentIndex < order.size()) {
-                    p.print(MessageManager.m(Message.PART_PLACED));
-                    p.print(String.format("YAW=%.2f PITCH=%.2f ROLL=%.2f", Math.toDegrees(part.getYaw()), Math.toDegrees(part.getPitch()), Math.toDegrees(part.getRoll())));
-                    p.print(MessageManager.m(Message.PLACE_NEXT_PART) + ChatColor.BOLD + ChatColor.WHITE + "(" + order.get(currentIndex) + ")" + ChatColor.RESET + ChatColor.YELLOW + " " + MessageManager.m(Message.WITH_LEFT_CLICK));
-                    p.print(MessageManager.m(Message.OR_CANCEL));
-                    p.print(MessageManager.m(Message.OR_MODIFY));
-                    p.print("" + ChatColor.WHITE + ChatColor.ITALIC + " /model adjust " + order.get(currentIndex - 1) + " <yaw> <pitch> <roll>." + ChatColor.RESET + ChatColor.YELLOW + " " + MessageManager.m(Message.AND_LATER));
-                }
-
-                if (currentIndex >= order.size()) {
-                    p.print(MessageManager.m(Message.PASTE_ALL1));
-                    p.print(MessageManager.m(Message.PASTE_ALL2));
-                    p.print(MessageManager.m(Message.PASTE_ALL3));
-                    p.print(MessageManager.m(Message.PASTE_ALL4));
-                    p.print("");
-
-                    for (String name : order) {
-                        ActivePart part2 = parts.get(name);
-                        p.print(ChatColor.BLUE + name + ChatColor.RESET + " : " + String.format("YAW=%.2f PITCH=%.2f ROLL=%.2f", Math.toDegrees(part2.getYaw()), Math.toDegrees(part2.getPitch()), Math.toDegrees(part2.getRoll())));
-                    }
-                }
-
-            }
+    public NextResult next(Player p) {
+        if (currentIndex >= partsOrder.size()) return NextResult.ALL_PLACED;
+        double yaw = Math.toRadians(moduloDegree(p.getLocation().getYaw()));
+        double pitch = Math.toRadians(moduloDegree(p.getLocation().getPitch()));
+        double roll = Math.toRadians(moduloDegree((float)currentRoll));
+        currentRoll = 0.0D;
+        ActivePart part = partsOrder.get(currentIndex);
+        if (currentIndex == 0) {
+            part.setPosition(BlockVector3.at(p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ()));
+            p.setPosition(p.getBlockOn().toVector().add(0.0D, part.getMaxRadius(scale), 0.0D), p.getLocation().getPitch(), p.getLocation().getYaw());
         }
+        part.updateYawPitchRoll(yaw, pitch, roll);
+
+        if (part.paste(p, false)) {
+            part.updatePos(part.getPosition());
+            ++currentIndex;
+            if (currentIndex < partsOrder.size()) return NextResult.PART_PLACED;
+            return NextResult.FINISHED;
+        }
+
+        return NextResult.FAILED;
     }
 
     /**
@@ -136,7 +111,7 @@ public abstract class Model {
      */
     public boolean undo(Player player) {
         if (currentIndex == 0) return false;
-        boolean success = parts.get(order.get(currentIndex - 1)).undo(player, null);
+        boolean success = partsOrder.get(currentIndex - 1).undo(player, null);
         if(!success) return false;
         currentIndex--;
         return true;
@@ -154,8 +129,8 @@ public abstract class Model {
      * @throws CommandException When not all parts are placed, or when the selected part not found
      */
     public boolean modify(Player p, String name, double yaw, double pitch, double roll) throws CommandException {
-        if (currentIndex < order.size()) {
-            throw new CommandException(MessageManager.m(Message.NOT_ALL_PLACED));
+        if (currentIndex == 0) {
+            throw new CommandException(MessageManager.m(Message.NOT_ANY_PLACED));
         }
 
         ActivePart part = parts.get(name);
@@ -173,8 +148,8 @@ public abstract class Model {
      * @param player player who created the model
      */
     public void finalise(ModelsPlugin plugin, Player player) {
-        for (String s : order) {
-            WorldEdit.getInstance().getSessionManager().get(player).remember(parts.get(s).getChanges());
+        for (ActivePart part : partsOrder) {
+            WorldEdit.getInstance().getSessionManager().get(player).remember(part.getChanges());
         }
     }
 
@@ -184,7 +159,7 @@ public abstract class Model {
      * @return true if the model is completed
      */
     public boolean isAtTheEnd() {
-        return currentIndex >= order.size();
+        return currentIndex >= partsOrder.size();
     }
 
     /**
@@ -194,8 +169,16 @@ public abstract class Model {
      */
     public void cancel(Player player) {
         for(int i = 0; i < currentIndex; ++i) {
-            WorldEdit.getInstance().getSessionManager().get(player).remember((parts.get(order.get(i))).getChanges());
+            WorldEdit.getInstance().getSessionManager().get(player).remember((partsOrder.get(i)).getChanges());
         }
+    }
+
+    public ActivePart getCurrentPart() {
+        return partsOrder.get(currentIndex);
+    }
+
+    public ActivePart getBeforePart() {
+        return partsOrder.get(Math.max(currentIndex - 1, 0));
     }
 
     public String getName() {
@@ -206,8 +189,8 @@ public abstract class Model {
         return parts;
     }
 
-    public List<String> getOrder() {
-        return order;
+    public List<ActivePart> getPartsInOrder() {
+        return partsOrder;
     }
 
     public double getScale() {

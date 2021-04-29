@@ -54,6 +54,6 @@ public class AdjustCommand extends Command {
     @Override
     public boolean canRunByPlayerRightNow(org.bukkit.entity.Player player) {
         Player p = ModelsPlugin.getWE().wrapPlayer(player);
-        return ModelsPlugin.getStateManager().hasPlayerSession(p) && ModelsPlugin.getStateManager().getSession(p).isAtTheEnd();
+        return ModelsPlugin.getStateManager().hasPlayerSession(p) && ModelsPlugin.getStateManager().getSession(p).getCurrentIndex() != 0;
     }
 }

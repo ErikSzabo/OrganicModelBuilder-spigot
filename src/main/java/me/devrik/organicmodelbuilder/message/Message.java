@@ -39,7 +39,7 @@ public enum Message {
     PASTE_ALL3("translations.paste-all3"),
     PASTE_ALL4("translations.paste-all4"),
     UNDOED("translations.undoed"),
-    NOT_ALL_PLACED("translations.not-all-placed"),
+    NOT_ANY_PLACED("translations.not-any-placed"),
     PART_NOT_FOUND("translations.part-not-found"),
     ADD_TO_HISTORY("translations.add-to-history"),
     VALIDATION_SUCCESS("translations.validation-success"),
