@@ -3,6 +3,7 @@ package me.devrik.organicmodelbuilder.command;
 import com.sk89q.minecraft.util.commands.CommandException;
 import me.devrik.organicmodelbuilder.ModelsPlugin;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public abstract class Command {
     private final String name;
@@ -33,4 +34,6 @@ public abstract class Command {
     public boolean canRunByConsole() {
         return console;
     }
+
+    public abstract boolean canRunByPlayerRightNow(Player player);
 }

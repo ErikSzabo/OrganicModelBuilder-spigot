@@ -29,4 +29,9 @@ public class ListCommand extends Command {
     public String getDescription() {
         return MessageManager.m(Message.CMD_LIST);
     }
+
+    @Override
+    public boolean canRunByPlayerRightNow(org.bukkit.entity.Player player) {
+        return true;
+    }
 }

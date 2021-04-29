@@ -80,4 +80,10 @@ public class LoadCommand extends Command {
     public String getDescription() {
         return MessageManager.m(Message.CMD_LOAD);
     }
+
+    @Override
+    public boolean canRunByPlayerRightNow(org.bukkit.entity.Player player) {
+        Player p = ModelsPlugin.getWE().wrapPlayer(player);
+        return !ModelsPlugin.getStateManager().hasPlayerSession(p);
+    }
 }

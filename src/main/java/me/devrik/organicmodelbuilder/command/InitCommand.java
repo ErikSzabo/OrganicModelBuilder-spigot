@@ -3,6 +3,7 @@ package me.devrik.organicmodelbuilder.command;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.worldedit.entity.Player;
 import me.devrik.organicmodelbuilder.model.ModelPart;
 import me.devrik.organicmodelbuilder.message.Message;
 import me.devrik.organicmodelbuilder.message.MessageManager;
@@ -50,5 +51,10 @@ public class InitCommand extends Command {
     @Override
     public String getDescription() {
         return MessageManager.m(Message.CMD_INIT);
+    }
+
+    @Override
+    public boolean canRunByPlayerRightNow(org.bukkit.entity.Player player) {
+        return !ModelsPlugin.getStateManager().isInit();
     }
 }

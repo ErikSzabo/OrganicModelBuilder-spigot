@@ -1,6 +1,7 @@
 package me.devrik.organicmodelbuilder.command;
 
 import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.worldedit.entity.Player;
 import me.devrik.organicmodelbuilder.message.Message;
 import me.devrik.organicmodelbuilder.message.MessageManager;
 import me.devrik.organicmodelbuilder.ModelsPlugin;
@@ -29,5 +30,10 @@ public class HelpCommand extends Command {
     @Override
     public String getDescription() {
         return MessageManager.m(Message.CMD_LIST);
+    }
+
+    @Override
+    public boolean canRunByPlayerRightNow(org.bukkit.entity.Player player) {
+        return true;
     }
 }

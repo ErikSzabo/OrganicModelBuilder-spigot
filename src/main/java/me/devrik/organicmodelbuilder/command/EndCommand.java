@@ -37,4 +37,10 @@ public class EndCommand extends Command{
     public String getDescription() {
         return MessageManager.m(Message.CMD_END);
     }
+
+    @Override
+    public boolean canRunByPlayerRightNow(org.bukkit.entity.Player player) {
+        Player p = ModelsPlugin.getWE().wrapPlayer(player);
+        return ModelsPlugin.getStateManager().hasPlayerSession(p);
+    }
 }

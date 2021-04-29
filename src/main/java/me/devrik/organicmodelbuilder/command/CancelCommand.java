@@ -34,4 +34,10 @@ public class CancelCommand extends Command{
     public String getDescription() {
         return MessageManager.m(Message.CMD_CANCEL);
     }
+
+    @Override
+    public boolean canRunByPlayerRightNow(org.bukkit.entity.Player player) {
+        Player p = ModelsPlugin.getWE().wrapPlayer(player);
+        return ModelsPlugin.getStateManager().hasPlayerSession(p);
+    }
 }

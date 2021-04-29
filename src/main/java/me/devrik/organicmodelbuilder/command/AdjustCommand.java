@@ -50,4 +50,10 @@ public class AdjustCommand extends Command {
     public String getDescription() {
         return MessageManager.m(Message.CMD_ADJUST);
     }
+
+    @Override
+    public boolean canRunByPlayerRightNow(org.bukkit.entity.Player player) {
+        Player p = ModelsPlugin.getWE().wrapPlayer(player);
+        return ModelsPlugin.getStateManager().hasPlayerSession(p) && ModelsPlugin.getStateManager().getSession(p).isAtTheEnd();
+    }
 }
