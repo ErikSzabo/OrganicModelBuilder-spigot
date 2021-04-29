@@ -10,9 +10,9 @@ import java.io.IOException;
 public class ModelLoader {
 
     public static ModelPart loadModel(String modelName, JsonObject obj) throws IOException, IllegalAccessException, InstantiationException {
-        String name = obj.get("Name").getAsString();
+        String name = obj.get("name").getAsString();
         boolean flip = obj.get("flip").getAsBoolean();
-        ModelPart[] children = loadChildren(modelName, obj.get("Childs").getAsJsonArray());
+        ModelPart[] children = loadChildren(modelName, obj.get("children").getAsJsonArray());
         return ModelsPlugin.getModelFactory().getModelPart(modelName, name, children, flip);
     }
 
