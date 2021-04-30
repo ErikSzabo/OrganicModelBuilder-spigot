@@ -62,6 +62,7 @@ public class ModelsPlugin extends JavaPlugin {
     public void onEnable() {
         this.getServer().getPluginManager().registerEvents(new PlayerInteractEventHandler(), this);
         this.getCommand("model").setTabCompleter(new TabCompletion());
+        this.getCommand("mll").setTabCompleter(new MllTabCompletion());
         try {
             new ModelInitRunnable().run();
         } catch (Exception  e) {
@@ -71,11 +72,17 @@ public class ModelsPlugin extends JavaPlugin {
     }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(args.length < 1) {
+        if(command.getName().equals("mll")) {
+            commandManager.executeCommand("load", sender, new String[] {"load", args[0]});
+        } else if(command.getName().equals("mlc")) {
+            commandManager.executeCommand("cancel", sender, args);
+        } else if(command.getName().equals("mle")) {
+            commandManager.executeCommand("end", sender, args);
+        } else if(args.length < 1) {
             sender.sendMessage(MessageManager.g(Message.CMD_INVALID));
-            return true;
+        } else {
+            commandManager.executeCommand(args[0], sender, args);
         }
-        commandManager.executeCommand(args[0], sender, args);
         return true;
     }
 

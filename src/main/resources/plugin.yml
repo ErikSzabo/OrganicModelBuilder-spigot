@@ -10,3 +10,12 @@ commands:
   model:
     description: This is the main command to use the models plugin.
     usage: /model help
+  mll:
+    description: Shorthand for /model load
+    usage: /mll <model>
+  mle:
+    description: Shorthand for /model end
+    usage: /mle
+  mlc:
+    description: Shorthand for /model cancel
+    usage: /mlc
