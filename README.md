@@ -21,3 +21,9 @@ Tested WE, FAWE versions (These are compatible for sure):
   - `/mll <model> [scale] [pattern]` Shorthand for `/model load`
   - `/mle` Shorthand for `/model end`
   - `/mlc` Shorthand for `/model cancel`
+
+## To install
+
+- download the **OrganicModelBuilder.zip** file (from the latest release)
+- extract it
+- paste everything into your plugins folder
