@@ -12,7 +12,7 @@ commands:
     usage: /model help
   mll:
     description: Shorthand for /model load
-    usage: /mll <model>
+    usage: /mll <model> [scale] [pattern]
   mle:
     description: Shorthand for /model end
     usage: /mle
