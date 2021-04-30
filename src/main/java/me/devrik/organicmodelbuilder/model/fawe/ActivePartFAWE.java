@@ -26,11 +26,11 @@ public class ActivePartFAWE extends ActivePart {
 
     public boolean paste(Player p, boolean modify) {
         try(EditSession session =  new EditSessionBuilder(model.getWorld()).player(p).build()) {
-            return miniPaste(session, p, modify);
+            return pasteHelper(session, p, modify);
         }
     }
 
-    private boolean miniPaste(EditSession e, Player p, boolean modify) {
+    private boolean pasteHelper(EditSession e, Player p, boolean modify) {
         this.changes = e;
         int maxR = getMaxRadius(model.getScale());
         BlockVector3 zero = position;
