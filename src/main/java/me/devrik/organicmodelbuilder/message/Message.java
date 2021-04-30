@@ -10,6 +10,7 @@ public enum Message {
     CMD_CANCEL("translations.cancel"),
     CMD_INIT("translations.init"),
     CMD_INVALID("translations.invalid"),
+    CMD_RELOAD("translations.reload"),
     NO_PERMISSION("translations.no-permission"),
     PLAYER_ONLY("translations.player-only"),
     NOT_ENOUGH_ARGS("translations.not-enough-args"),
@@ -48,7 +49,8 @@ public enum Message {
     PART_PLACED("translations.part-placed"),
     PLACE_NEXT_PART("translations.place-next-part"),
     OR_MODIFY("translations.or-modify"),
-    NOTHING_TO_UNDO("translations.nothing-to-undo");
+    NOTHING_TO_UNDO("translations.nothing-to-undo"),
+    RELOADED("translations.reloaded");
 
     private String value;
 

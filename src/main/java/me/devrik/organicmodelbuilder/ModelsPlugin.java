@@ -40,6 +40,7 @@ public class ModelsPlugin extends JavaPlugin {
         commandManager.addCommand(new LoadCommand());
         commandManager.addCommand(new RollCommand());
         commandManager.addCommand(new CancelCommand());
+        commandManager.addCommand(new ReloadCommand());
 
         File f = new File(this.getDataFolder(), "models");
         if (!f.exists()) f.mkdir();
